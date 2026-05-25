@@ -175,6 +175,8 @@ Built as part of a learning journey in game design, systems thinking, and comput
 > A platform where users don’t just listen to music —
 > they experience, play, and discover it dynamically.
 
+---
+
 ## 🎮 Prototype Preview
 
 A functional MVP built using HTML Canvas demonstrating core gameplay systems:
