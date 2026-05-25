@@ -64,6 +64,7 @@ let snake = new Snake();
 
 let score = 0;
 let gameOver = false;
+let restartBtn = document.getElementById("restartBtn");
 
 
 // 4. INPUT
@@ -87,13 +88,29 @@ function checkCollision() {
         gameOver = true;
     }
 }
+restartBtn.addEventListener("click", () => {
+    // reset everything
+    player = new Player();
+    snake = new Snake();
+    score = 0;
+    gameOver = false;
 
+    restartBtn.style.display = "none";
+
+    gameLoop(); // restart loop
+});
 
 // 6. GAME LOOP
-
 function gameLoop() {
+
     if (gameOver) {
-        alert("Game Over");
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        ctx.fillStyle = "black";
+        ctx.font = "40px Arial";
+        ctx.fillText("Game Over", 300, 200);
+
+        restartBtn.style.display = "block";
         return;
     }
 
@@ -112,9 +129,11 @@ function gameLoop() {
     ctx.fillStyle = "black";
     ctx.font = "20px Arial";
     ctx.fillText("Score: " + score, 10, 30);
+    ctx.fillText("Press SPACE to jump", 10, 60);
 
     requestAnimationFrame(gameLoop);
 }
+
 
 
 // 7. START GAME
