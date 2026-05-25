@@ -10,7 +10,7 @@
 
 ---
 
-## 🚀 Overview
+## 🌐 Overview
 
 **Frog Music Game Engine** is an experimental interactive system where music is not just listened to — it is *played*.
 
@@ -24,7 +24,7 @@ This project explores the intersection of:
 
 ---
 
-## 💡 Problem Statement
+## 🔍 Problem Statement
 
 Modern music platforms rely heavily on passive listening and algorithmic playlists, making it difficult for underrated or emerging artists to gain visibility.
 
@@ -35,7 +35,7 @@ This project addresses that by:
 
 ---
 
-## 🎯 Core Concept
+## 📑 Core Concept
 
 - Each **song = a game level**
 - Game environment adapts to **audio + tags**
@@ -44,7 +44,7 @@ This project addresses that by:
 
 ---
 
-## 🧠 System Architecture
+## 🪛 System Architecture
 
 ```text
 User plays game
@@ -62,7 +62,7 @@ User plays game
 
 ---
 
-### 🌱 Platform System
+### 🖥️ Platform System
 - Dynamic spawning platforms appear during gameplay
 - Some platforms contain “lotus” rewards
 - Rule: no two lotus spawns can appear consecutively
@@ -76,7 +76,7 @@ User plays game
 
 ---
 
-### ⚠️ Interaction Rules
+### 👇 Interaction Rules
 - 🪷 Lotus → +score / reward
 - 🐍 Snake → game over
 - 🟢 Survival time increases reward multiplier
@@ -113,7 +113,6 @@ Each level is bound to a structured audio object:
 
 ## ▶️ Game Flow
 
-```text
 Select Song
 → Load Audio + Environment
 → Start Gameplay
