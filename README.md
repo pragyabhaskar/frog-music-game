@@ -174,3 +174,14 @@ Built as part of a learning journey in game design, systems thinking, and comput
 
 > A platform where users don’t just listen to music —
 > they experience, play, and discover it dynamically.
+
+## 🎮 Prototype Preview
+
+A functional MVP built using HTML Canvas demonstrating core gameplay systems:
+
+- Player movement with jump physics
+- Enemy obstacle system (snake)
+- Real-time collision detection
+- Continuous score tracking
+
+> Note: This is an early prototype. Visual design and music integration will be added in future iterations.
