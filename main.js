@@ -5,6 +5,9 @@ let ctx = canvas.getContext("2d");
 canvas.width = 800;
 canvas.height = 400;
 
+let homeScreen = document.getElementById("homeScreen");
+let playBtn = document.getElementById("playBtn");
+
 
 // 2. CLASSES
 
