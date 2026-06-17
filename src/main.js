@@ -54,7 +54,8 @@ function createGameOverScreen() {
     
     document.getElementById("restartBtn").addEventListener("click", () => {
         gameOverScreen.style.display = "none";
-        initGame();
+        homeScreen.style.display = "flex";
+        canvas.style.display = "none";
     });
     
     return screen;
@@ -71,11 +72,11 @@ function initGame() {
     gameState.lastSpawnTime = 0;
     gameState.difficulty = 1;
     
-    // Frog on right side, middle height
-    gameState.frog = new Frog(canvas.width - 100, canvas.height - 60);
+    // Frog on RIGHT side, near bottom
+    gameState.frog = new Frog(canvas.width - 100, canvas.height - 100);
     
-    // Snake on left side, middle height
-    gameState.snake = new Snake(30, canvas.height - 55);
+    // Snake on LEFT side, near bottom
+    gameState.snake = new Snake(20, canvas.height - 95);
     
     // No lotus initially
     gameState.lotus = null;
@@ -89,7 +90,7 @@ function initGame() {
 
 function spawnLotus() {
     // Spawn lotus from left side, random height
-    const spawnY = Math.random() * (canvas.height - 80) + 40;
+    const spawnY = Math.random() * (canvas.height - 150) + 50;
     const speed = 2 + gameState.difficulty * 0.5; // Speed increases with difficulty
     gameState.lotus = new Lotus(-30, spawnY, speed);
 }
@@ -106,7 +107,7 @@ function update() {
     if (!gameState.running) return;
 
     // Update frog
-    if (inputHandler.getJumpInput()) {
+    if (inputHandler && inputHandler.getJumpInput()) {
         gameState.frog.jump();
     }
     gameState.frog.update();
@@ -164,9 +165,17 @@ function endGame() {
 // ============================================
 
 function draw() {
-    // Clear canvas with gradient effect
+    // Clear canvas
     ctx.fillStyle = "#E8F4F8";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Draw ground line
+    ctx.strokeStyle = "#999";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(0, canvas.height - 70);
+    ctx.lineTo(canvas.width, canvas.height - 70);
+    ctx.stroke();
 
     // Draw entities
     gameState.frog.draw(ctx);
@@ -181,7 +190,7 @@ function draw() {
     ctx.font = "bold 20px Arial";
     ctx.fillText(`Score: ${gameState.score}`, 20, 30);
     ctx.fillText(`High: ${scoreManager.highScore}`, 20, 55);
-    ctx.fillText(`Difficulty: ${gameState.difficulty.toFixed(1)}x`, canvas.width - 200, 30);
+    ctx.fillText(`Difficulty: ${gameState.difficulty.toFixed(1)}x`, canvas.width - 220, 30);
 
     // Draw instructions
     ctx.font = "14px Arial";
@@ -214,7 +223,7 @@ playBtn.addEventListener("click", () => {
     initGame();
 });
 
-// Initialize input handler (ready for play)
+// Initialize on page load
 window.addEventListener("load", () => {
     console.log("🎮 Frog Music Game loaded and ready to play!");
 });
