@@ -1,0 +1,88 @@
+body {
+    margin: 0;
+    text-align: center;
+    font-family: Arial, sans-serif;
+    background: #dff6ff;
+}
+
+canvas {
+    display: none;
+    background: white;
+    border: 2px solid #333;
+    margin-top: 20px;
+}
+
+#homeScreen {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#homeScreen h1 {
+    font-size: 48px;
+    margin: 0 0 30px 0;
+}
+
+#homeScreen p {
+    font-size: 18px;
+    color: #666;
+    margin: 0 0 30px 0;
+}
+
+#playBtn {
+    font-size: 30px;
+    padding: 15px 30px;
+    cursor: pointer;
+    border-radius: 10px;
+    border: none;
+    background: green;
+    color: white;
+    transition: background 0.3s;
+}
+
+#playBtn:hover {
+    background: darkgreen;
+}
+
+#gameOverScreen {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.9);
+    padding: 40px;
+    border-radius: 15px;
+    color: white;
+    z-index: 100;
+    text-align: center;
+}
+
+#gameOverScreen h2 {
+    font-size: 36px;
+    margin: 0 0 20px 0;
+    color: #FFD93D;
+}
+
+#gameOverScreen p {
+    font-size: 20px;
+    margin: 10px 0;
+}
+
+#restartBtn {
+    margin-top: 30px;
+    font-size: 20px;
+    padding: 12px 25px;
+    background: green;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+#restartBtn:hover {
+    background: darkgreen;
+}
