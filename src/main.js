@@ -72,11 +72,17 @@ function initGame() {
     gameState.lastSpawnTime = 0;
     gameState.difficulty = 1;
     
-    // Frog on RIGHT side, near bottom
-    gameState.frog = new Frog(canvas.width - 100, canvas.height - 100);
+    // Ground level
+    const groundLevel = canvas.height - 80;
     
-    // Snake on LEFT side, near bottom
-    gameState.snake = new Snake(20, canvas.height - 95);
+    // Frog: between middle and snake
+    // Middle = 400, Snake = canvas.width - 80 = 720
+    // Frog position = (middle + snake) / 2 = (400 + 720) / 2 = 560
+    const frogX = (canvas.width / 2 + (canvas.width - 80)) / 2;
+    gameState.frog = new Frog(frogX, groundLevel);
+    
+    // Snake on RIGHT side
+    gameState.snake = new Snake(canvas.width - 80, groundLevel);
     
     // No lotus initially
     gameState.lotus = null;
@@ -89,8 +95,9 @@ function initGame() {
 // ============================================
 
 function spawnLotus() {
-    // Spawn lotus from left side, random height
-    const spawnY = Math.random() * (canvas.height - 150) + 50;
+    // Spawn lotus from LEFT side, at ground level
+    const groundLevel = canvas.height - 80;
+    const spawnY = groundLevel;
     const speed = 2 + gameState.difficulty * 0.5; // Speed increases with difficulty
     gameState.lotus = new Lotus(-30, spawnY, speed);
 }
@@ -170,11 +177,12 @@ function draw() {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // Draw ground line
+    const groundLevel = canvas.height - 80;
     ctx.strokeStyle = "#999";
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.moveTo(0, canvas.height - 70);
-    ctx.lineTo(canvas.width, canvas.height - 70);
+    ctx.moveTo(0, groundLevel);
+    ctx.lineTo(canvas.width, groundLevel);
     ctx.stroke();
 
     // Draw entities
