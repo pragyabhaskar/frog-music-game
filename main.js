@@ -17,17 +17,19 @@ let playBtn = document.getElementById("playBtn");
 // ============================================
 
 class Frog {
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
-        this.width = 40;
-        this.height = 30;
-        this.jumping = false;
-        this.jumpVelocity = 0;
-        this.gravity = 0.4;
-        this.jumpPower = 10;
-        this.groundLevel = y;
-    }
+ constructor(x, y) {
+    this.x = x; // KEEP THIS
+    this.width = 40;
+    this.height = 30;
+
+    this.groundLevel = canvas.height - this.height - 20;
+    this.y = this.groundLevel;
+
+    this.jumping = false;
+    this.jumpVelocity = 0;
+    this.gravity = 0.4;
+    this.jumpPower = 10;
+}
 
     jump() {
         if (!this.jumping) {
@@ -263,9 +265,13 @@ function update() {
 // ============================================
 
 function draw() {
-    // Clear canvas
+    // 1.Clear canvas
     ctx.fillStyle = "#E8F4F8";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+//2.Ground
+ctx.fillStyle = "#555";
+ctx.fillRect(0, canvas.height - 20, canvas.width, 20);
 
     // Draw entities
     gameState.frog.draw(ctx);
