@@ -1,11 +1,12 @@
+![Gameplay Demo](./assets/demo.gif)
+
 # 🐸 Frog Music Game
 
-![Unity](https://img.shields.io/badge/Engine-Unity-000000?style=for-the-badge&logo=unity&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/Code-JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
-![Python](https://img.shields.io/badge/AI-Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![HTML](https://img.shields.io/badge/Markup-HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
+![CSS](https://img.shields.io/badge/Style-CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
 ![Status](https://img.shields.io/badge/Status-In%20Development-orange?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)
-
 
 A **music-driven browser game** where a frog moves and reacts based on rhythm and player input.
 
@@ -81,6 +82,16 @@ This project is part of my journey to:
 - Learn game development
 - Build interactive experiences
 - Explore music + gameplay mechanics
+
+---
+
+## 🔮 Future Expansion
+
+A more advanced version of this game will be developed using **Unity** in a separate repository, focusing on:
+- Better physics
+- Advanced animations
+- Enhanced audio synchronization
+- Cross-platform support
 
 ---
 
