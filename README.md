@@ -1,4 +1,3 @@
-![Gameplay Demo](./assets/demo.gif)
 
 # 🐸 Frog Music Game
 
