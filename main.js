@@ -18,7 +18,7 @@ let playBtn = document.getElementById("playBtn");
 
 class Frog {
  constructor(x, y) {
-    this.x = x; // KEEP THIS
+    this.x = x; 
     this.width = 40;
     this.height = 30;
 
@@ -44,7 +44,7 @@ class Frog {
             this.y += this.jumpVelocity;
 
             // Land when reaching ground level
-            if (this.y >= this.groundLevel) {
+            if (this.y >= this.groundLevel-0.5) {
                 this.y = this.groundLevel;
                 this.jumping = false;
                 this.jumpVelocity = 0;
