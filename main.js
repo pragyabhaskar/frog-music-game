@@ -27,8 +27,8 @@ class Frog {
 
     this.jumping = false;
     this.jumpVelocity = 0;
-    this.gravity = 0.8;
-    this.jumpPower = 18;
+    this.gravity = 1;
+    this.jumpPower = 20;
 }
 
     jump() {
@@ -60,7 +60,7 @@ update() {
 
     // Debug hitbox
     ctx.strokeStyle = "#00AA00";
-   ctx.lineWidth = 3;
+   ctx.lineWidth = 2;
 
 ctx.strokeRect(
     this.x,
@@ -69,11 +69,12 @@ ctx.strokeRect(
     this.height
 );
 
-    ctx.font = "30px Arial";
+    ctx.font = "40px Arial";
+    ctx.textBaseline = "top";
     ctx.fillText(
         "🐸",
         this.x,
-        this.y + this.height
+        this.y
     );
 }
 
