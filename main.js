@@ -104,7 +104,7 @@ class Lotus {
     }
 
     update() {
-        this.x += this.speed;
+        this.x -= this.speed;
     }
 
     draw(ctx) {
@@ -211,19 +211,13 @@ function initGame() {
 // ============================================
 
 function spawnLotus() {
-    // Spawn lotus from left side, random height
     const spawnY = Math.random() * (canvas.height - 80) + 40;
-    gameState.lotus = new Lotus(-30, spawnY);
+    gameState.lotus = new Lotus(canvas.width, spawnY); // start at right edge
 }
 
-function update() {
-    if (!gameState.running) return;
 
-    // Update frog
-    if (input.jumpPressed) {
-        gameState.frog.jump();
-        input.jumpPressed = false;
-    }
+function update() {
+    if (!gameState.running) return;   
     gameState.frog.update();
 
     // Spawn lotus if needed
