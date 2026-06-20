@@ -27,14 +27,16 @@ class Frog {
 
     this.jumping = false;
     this.jumpVelocity = 0;
-    this.gravity = 0.6;
-    this.jumpPower = 14;
+    this.gravity = 0.8;
+    this.jumpPower = 18;
 }
 
     jump() {
     if (!this.jumping) {
-        this.jumpVelocity = -this.jumpPower;
         this.jumping = true;
+
+        // stronger upward launch
+        this.jumpVelocity = -18;
     }
 }
 update() {
@@ -58,12 +60,14 @@ update() {
 
     // Debug hitbox
     ctx.strokeStyle = "#00AA00";
-    ctx.strokeRect(
-        this.x,
-        this.y,
-        this.width,
-        this.height
-    );
+   ctx.lineWidth = 3;
+
+ctx.strokeRect(
+    this.x,
+    this.y,
+    this.width,
+    this.height
+);
 
     ctx.font = "30px Arial";
     ctx.fillText(
