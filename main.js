@@ -162,23 +162,25 @@ let input = {
 // 5. INPUT HANDLING
 // ============================================
 
+// Keyboard (desktop)
 document.addEventListener("keydown", (e) => {
-    if ((e.key === " " || e.key === "ArrowUp" || e.key === "w") && gameState.running) {
-        input.jumpPressed = true;
+    if ((e.code === "Space" || e.key === "ArrowUp" || e.key === "w") && gameState.running) {
+        gameState.frog.jump();
     }
 });
 
-document.addEventListener("keyup", (e) => {
-    if (e.key === " " || e.key === "ArrowUp" || e.key === "w") {
-        input.jumpPressed = false;
-    }
-});
-
-// Click/tap for mobile
+// Mouse click (desktop)
 canvas.addEventListener("click", () => {
     if (gameState.running) {
-        input.jumpPressed = true;
-        setTimeout(() => { input.jumpPressed = false; }, 50);
+        gameState.frog.jump();
+    }
+});
+
+// Touch (mobile)
+canvas.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    if (gameState.running) {
+        gameState.frog.jump();
     }
 });
 
