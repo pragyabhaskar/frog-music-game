@@ -32,7 +32,7 @@ class Frog {
 }
 
     jump() {
-        if (!this.jumping) {
+        if (!this.jumping && this.y >= this.groundLevel - 2) {
             this.jumping = true;
             this.jumpVelocity = -this.jumpPower;
         }
@@ -40,14 +40,15 @@ class Frog {
 
     update() {
         if (this.jumping) {
-            this.jumpVelocity += this.gravity;
-            this.y += this.jumpVelocity;
+           // Apply gravity each frame
+           this.y += this.jumpVelocity;
+           this.jumpVelocity += this.gravity;
 
-            // Land when reaching ground level
-            if (this.y >= this.groundLevel) {
-                this.y = this.groundLevel;
-                this.jumping = false;
-                this.jumpVelocity = 0;
+           // Land when reaching ground level
+           if (this.y >= this.groundLevel) {
+               this.y = this.groundLevel;
+               this.jumping = false;
+               this.jumpVelocity = 0;
             }
         }
     }
@@ -298,7 +299,7 @@ function gameLoop() {
 
     update();
     draw();
-
+    // Keep the loop running smoothly
     requestAnimationFrame(gameLoop);
 }
 
