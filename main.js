@@ -41,7 +41,7 @@ class Frog {
 }
 update() {
     if (!this.jumping) return;
-console.log(this.y, this.jumpVelocity);
+
     // Move
     this.y += this.jumpVelocity;
 
