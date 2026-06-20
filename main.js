@@ -32,29 +32,33 @@ class Frog {
 }
 
     jump() {
-        if (!this.jumping && this.y >= this.groundLevel - 2) {
-            this.jumping = true;
-            this.jumpVelocity = -this.jumpPower;
+    if (!this.jumping) {
+        this.jumpVelocity = -this.jumpPower;
+        this.jumping = true;
+    }
+}
+ update() {
+    if (this.jumping) {
+
+        // move frog upward/downward
+        this.y += this.jumpVelocity;
+
+        // gravity pulls down
+        this.jumpVelocity += this.gravity;
+
+        // land
+        if (this.y >= this.groundLevel) {
+            this.y = this.groundLevel;
+            this.jumpVelocity = 0;
+            this.jumping = false;
         }
     }
-
-    update() {
-        if (this.jumping) {           
-          // Then move frog
-            this.y += this.jumpVelocity; 
-          // Gravity pulls down
-            this.jumpVelocity += this.gravity;
-
-           // Land when reaching ground level
-           if (this.y >= this.groundLevel) {
-               this.y = this.groundLevel;
-               this.jumping = false;
-               this.jumpVelocity = 0;
-            }
-        }
-    }
+}
+        
+    
 
     draw(ctx) {
+        ctx.font = "24px Arial";
         ctx.fillStyle = "#00AA00";
         ctx.fillRect(this.x, this.y, this.width, this.height);
         ctx.fillStyle = "#000";
@@ -80,6 +84,7 @@ class Snake {
     }
 
     draw(ctx) {
+        ctx.font = "24px Arial";
         ctx.fillStyle = "#FF6B6B";
         ctx.fillRect(this.x, this.y, this.width, this.height);
         ctx.fillStyle = "#000";
@@ -164,7 +169,7 @@ let input = {
 // 5. INPUT HANDLING
 // ============================================
 function handleJump() {
-    if (gameState.running && !gameState.frog.jumping) {
+    if (gameState.running) {
         gameState.frog.jump();
     }
 }
@@ -213,10 +218,18 @@ function initGame() {
 // ============================================
 
 function spawnLotus() {
-    const spawnY = canvas.height - 70;
 
-    // Spawn OFFSCREEN LEFT
-    gameState.lotus = new Lotus(-40, spawnY);
+    // Random vertical position
+    const spawnY =
+        Math.random() *
+        (canvas.height - 120) + 40;
+
+    // Start from LEFT side
+    gameState.lotus =
+        new Lotus(
+            -gameState.frog.width,
+            spawnY
+        );
 }
 
 
