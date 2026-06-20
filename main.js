@@ -39,10 +39,11 @@ class Frog {
     }
 
     update() {
-        if (this.jumping) {
-           // Apply gravity each frame
-           this.y += this.jumpVelocity;
-           this.jumpVelocity += this.gravity;
+        if (this.jumping) {           
+          // Then move frog
+            this.y += this.jumpVelocity; 
+          // Gravity pulls down
+            this.jumpVelocity += this.gravity;
 
            // Land when reaching ground level
            if (this.y >= this.groundLevel) {
@@ -105,7 +106,7 @@ class Lotus {
     }
 
     update() {
-        this.x -= this.speed;
+        this.x += this.speed;
     }
 
     draw(ctx) {
@@ -248,13 +249,13 @@ function update() {
             gameState.score += 10; // Reward for successfully dodging
             gameState.lastSpawnTime = 0; // Reset spawn timer
         }
-
-        // Lotus left screen (frog dodged, snake missed)
-        if (gameState.lotus && gameState.lotus.x > canvas.width) {
-            gameState.lotus = null;
-            gameState.score += 5; // Partial reward
-            gameState.lastSpawnTime = 0;
-        }
+        
+       // Lotus left screen (frog dodged, snake missed)
+       if (gameState.lotus && gameState.lotus.x > canvas.width + gameState.lotus.width) {
+           gameState.lotus = null;
+           gameState.score += 5;
+           gameState.lastSpawnTime = 0;
+       }
     }
 }
 
