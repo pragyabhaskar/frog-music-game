@@ -27,8 +27,8 @@ class Frog {
 
     this.jumping = false;
     this.jumpVelocity = 0;
-    this.gravity = 0.4;
-    this.jumpPower = 10;
+    this.gravity = 0.6;
+    this.jumpPower = 14;
 }
 
     jump() {
@@ -37,21 +37,20 @@ class Frog {
         this.jumping = true;
     }
 }
- update() {
-    if (this.jumping) {
+update() {
+    if (!this.jumping) return;
 
-        // move frog upward/downward
-        this.y += this.jumpVelocity;
+    // Move
+    this.y += this.jumpVelocity;
 
-        // gravity pulls down
-        this.jumpVelocity += this.gravity;
+    // Gravity
+    this.jumpVelocity += this.gravity;
 
-        // land
-        if (this.y >= this.groundLevel) {
-            this.y = this.groundLevel;
-            this.jumpVelocity = 0;
-            this.jumping = false;
-        }
+    // Land
+    if (this.y >= this.groundLevel) {
+        this.y = this.groundLevel;
+        this.jumpVelocity = 0;
+        this.jumping = false;
     }
 }
             
