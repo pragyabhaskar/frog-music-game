@@ -54,16 +54,25 @@ class Frog {
         }
     }
 }
-        
-    
-
+            
     draw(ctx) {
-        ctx.font = "24px Arial";
-        ctx.fillStyle = "#00AA00";
-        ctx.fillRect(this.x, this.y, this.width, this.height);
-        ctx.fillStyle = "#000";
-        ctx.fillText("🐸", this.x + 8, this.y + 22);
-    }
+
+    // Debug hitbox
+    ctx.strokeStyle = "#00AA00";
+    ctx.strokeRect(
+        this.x,
+        this.y,
+        this.width,
+        this.height
+    );
+
+    ctx.font = "30px Arial";
+    ctx.fillText(
+        "🐸",
+        this.x,
+        this.y + this.height
+    );
+}
 
     getBounds() {
         return {
@@ -84,12 +93,23 @@ class Snake {
     }
 
     draw(ctx) {
-        ctx.font = "24px Arial";
-        ctx.fillStyle = "#FF6B6B";
-        ctx.fillRect(this.x, this.y, this.width, this.height);
-        ctx.fillStyle = "#000";
-        ctx.fillText("🐍", this.x + 12, this.y + 18);
-    }
+
+    // Debug hitbox
+    ctx.strokeStyle = "#FF6B6B";
+    ctx.strokeRect(
+        this.x,
+        this.y,
+        this.width,
+        this.height
+    );
+
+    ctx.font = "30px Arial";
+    ctx.fillText(
+        "🐍",
+        this.x,
+        this.y + this.height
+    );
+}
 
     getBounds() {
         return {
@@ -114,14 +134,24 @@ class Lotus {
         this.x += this.speed;
     }
 
-    draw(ctx) {
-        ctx.fillStyle = "#FFD93D";
-        ctx.beginPath();
-        ctx.arc(this.x + this.width / 2, this.y + this.height / 2, this.width / 2, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = "#000";
-        ctx.fillText("🪷", this.x + 3, this.y + 22);
-    }
+   draw(ctx) {
+
+    // Debug hitbox
+    ctx.strokeStyle = "#FFD93D";
+    ctx.strokeRect(
+        this.x,
+        this.y,
+        this.width,
+        this.height
+    );
+
+    ctx.font = "28px Arial";
+    ctx.fillText(
+        "🪷",
+        this.x,
+        this.y + this.height
+    );
+}
 
     getBounds() {
         return {
