@@ -27,8 +27,8 @@ class Frog {
 
     this.jumping = false;
     this.jumpVelocity = 0;
-    this.gravity = 1;
-    this.jumpPower = 20;
+    this.gravity = 1.2;
+    this.jumpPower = 14;
 }
 
     jump() {
@@ -36,7 +36,7 @@ class Frog {
         this.jumping = true;
 
         // stronger upward launch
-        this.jumpVelocity = -18;
+        this.jumpVelocity = -this.jumpPower;
     }
 }
 update() {
@@ -203,7 +203,7 @@ let input = {
 // 5. INPUT HANDLING
 // ============================================
 function handleJump() {
-    console.log("JUMP");
+    
     if (gameState.running) {
         gameState.frog.jump();
     }
