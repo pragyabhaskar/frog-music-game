@@ -44,7 +44,7 @@ class Frog {
             this.y += this.jumpVelocity;
 
             // Land when reaching ground level
-            if (this.y >= this.groundLevel-0.5) {
+            if (this.y >= this.groundLevel) {
                 this.y = this.groundLevel;
                 this.jumping = false;
                 this.jumpVelocity = 0;
@@ -161,12 +161,12 @@ let input = {
 // ============================================
 // 5. INPUT HANDLING
 // ============================================
-// Universal input (works everywhere)
 function handleJump() {
-    if (gameState.running) {
+    if (gameState.running && !gameState.frog.jumping) {
         gameState.frog.jump();
     }
 }
+
 
 // Keyboard
 document.addEventListener("keydown", (e) => {
