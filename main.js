@@ -199,6 +199,7 @@ let input = {
 // 5. INPUT HANDLING
 // ============================================
 function handleJump() {
+    console.log("JUMP");
     if (gameState.running) {
         gameState.frog.jump();
     }
@@ -207,19 +208,28 @@ function handleJump() {
 
 // Keyboard
 document.addEventListener("keydown", (e) => {
-    if (e.code === "Space" || e.key === "ArrowUp" || e.key === "w") {
+    if (
+        e.code === "Space" ||
+        e.key === "ArrowUp" ||
+        e.key === "w"
+    ) {
+        e.preventDefault();
         handleJump();
     }
 });
 
 // Mouse
-document.addEventListener("click", handleJump);
+canvas.addEventListener("click", handleJump);
 
 // Touch (MOST IMPORTANT)
-document.addEventListener("touchstart", (e) => {
-    e.preventDefault();
-    handleJump();
-}, { passive: false });
+canvas.addEventListener(
+    "touchstart",
+    (e) => {
+        e.preventDefault();
+        handleJump();
+    },
+    { passive: false }
+);
 
 
 // ============================================
