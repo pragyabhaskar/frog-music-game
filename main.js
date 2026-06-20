@@ -294,12 +294,12 @@ ctx.fillRect(0, canvas.height - 20, canvas.width, 20);
 // ============================================
 
 function gameLoop() {
+    if (!gameState.running) return;
+
     update();
     draw();
-    
-    if (gameState.running) {
-        requestAnimationFrame(gameLoop);
-    }
+
+    requestAnimationFrame(gameLoop);
 }
 
 // ============================================
