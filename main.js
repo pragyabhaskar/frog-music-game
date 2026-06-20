@@ -293,29 +293,14 @@ function update() {
         gameState.lotus.update();
 
         // Check collision: Frog + Lotus
-       // Check collision: Frog + Lotus
-if (
-    checkCollision(
-        gameState.frog.getBounds(),
-        gameState.lotus.getBounds()
-    )
-) {
-
-    gameState.running = false;
-
-    setTimeout(() => {
-
-        alert(
-            `Game Over! Final Score: ${gameState.score}`
-        );
-
-        homeScreen.style.display = "flex";
-        canvas.style.display = "none";
-
-    }, 50);
-
-    return;
-}
+        if (checkCollision(gameState.frog.getBounds(), gameState.lotus.getBounds())) {
+            // Game over
+            gameState.running = false;
+            alert(`Game Over! Final Score: ${gameState.score}`);
+            homeScreen.style.display = "flex";
+            canvas.style.display = "none";
+            return;
+        }
 
         // Check collision: Snake + Lotus (catch)
         if (checkCollision(gameState.snake.getBounds(), gameState.lotus.getBounds())) {
@@ -370,13 +355,11 @@ ctx.fillRect(0, canvas.height - 20, canvas.width, 20);
 // ============================================
 
 function gameLoop() {
+    if (!gameState.running) return;
 
-    if (gameState.running) {
-        update();
-    }
-
+    update();
     draw();
-
+    // Keep the loop running smoothly
     requestAnimationFrame(gameLoop);
 }
 
