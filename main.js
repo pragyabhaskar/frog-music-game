@@ -27,8 +27,8 @@ class Frog {
 
     this.jumping = false;
     this.jumpVelocity = 0;
-    this.gravity = 1.2;
-    this.jumpPower = 14;
+    this.gravity = 1.6;
+    this.jumpPower = 12;
 }
 
     jump() {
