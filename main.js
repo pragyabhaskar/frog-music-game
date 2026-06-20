@@ -161,28 +161,29 @@ let input = {
 // ============================================
 // 5. INPUT HANDLING
 // ============================================
+// Universal input (works everywhere)
+function handleJump() {
+    if (gameState.running) {
+        gameState.frog.jump();
+    }
+}
 
-// Keyboard (desktop)
+// Keyboard
 document.addEventListener("keydown", (e) => {
-    if ((e.code === "Space" || e.key === "ArrowUp" || e.key === "w") && gameState.running) {
-        gameState.frog.jump();
+    if (e.code === "Space" || e.key === "ArrowUp" || e.key === "w") {
+        handleJump();
     }
 });
 
-// Mouse click (desktop)
-canvas.addEventListener("click", () => {
-    if (gameState.running) {
-        gameState.frog.jump();
-    }
-});
+// Mouse
+document.addEventListener("click", handleJump);
 
-// Touch (mobile)
-canvas.addEventListener("touchstart", (e) => {
+// Touch (MOST IMPORTANT)
+document.addEventListener("touchstart", (e) => {
     e.preventDefault();
-    if (gameState.running) {
-        gameState.frog.jump();
-    }
-});
+    handleJump();
+}, { passive: false });
+
 
 // ============================================
 // 6. GAME INITIALIZATION
