@@ -213,8 +213,10 @@ function initGame() {
 // ============================================
 
 function spawnLotus() {
-    const spawnY = Math.random() * (canvas.height - 80) + 40;
-    gameState.lotus = new Lotus(canvas.width, spawnY); // start at right edge
+    const spawnY = canvas.height - 70;
+
+    // Spawn OFFSCREEN LEFT
+    gameState.lotus = new Lotus(-40, spawnY);
 }
 
 
@@ -251,7 +253,7 @@ function update() {
         }
         
        // Lotus left screen (frog dodged, snake missed)
-       if (gameState.lotus && gameState.lotus.x > canvas.width + gameState.lotus.width) {
+       if (gameState.lotus && gameState.lotus.x > canvas.width) {
            gameState.lotus = null;
            gameState.score += 5;
            gameState.lastSpawnTime = 0;
