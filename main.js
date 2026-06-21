@@ -1,374 +1,625 @@
-// ============================================
-// FROG-SNAKE-LOTUS GAME PROTOTYPE
-// ============================================
+// ======================================
+// FROG MUSIC GAME
+// ======================================
 
-// 1. SETUP
-let canvas = document.getElementById("game");
-let ctx = canvas.getContext("2d");
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
 
 canvas.width = 800;
 canvas.height = 400;
 
-let homeScreen = document.getElementById("homeScreen");
-let playBtn = document.getElementById("playBtn");
+const homeScreen =
+document.getElementById("homeScreen");
 
-// ============================================
-// 2. ENTITY CLASSES
-// ============================================
+const playBtn =
+document.getElementById("playBtn");
+
+const GROUND_Y =
+canvas.height - 80;
+
+// =========================
+// UTIL
+// =========================
+
+function hit(a, b) {
+return (
+a.x < b.x + b.width &&
+a.x + a.width > b.x &&
+a.y < b.y + b.height &&
+a.y + a.height > b.y
+);
+}
+
+// =========================
+// FROG
+// =========================
 
 class Frog {
- constructor(x, y) {
-    this.x = x; 
-    this.width = 40;
-    this.height = 30;
 
-    this.groundLevel = canvas.height - this.height - 20;
-    this.y = this.groundLevel;
+constructor() {
 
-    this.jumping = false;
-    this.jumpVelocity = 0;
-    this.gravity = 1.6;
-    this.jumpPower = 12;
+this.width = 50;
+this.height = 50;
+
+this.x =
+canvas.width - 260;
+
+this.y =
+GROUND_Y - this.height;
+
+this.ground =
+this.y;
+
+this.vy = 0;
+
+this.gravity = 1.2;
+
+this.jumpForce = -18;
+
+this.jumping = false;
+
 }
 
-    jump() {
-    if (!this.jumping) {
-        this.jumping = true;
+jump() {
 
-        // stronger upward launch
-        this.jumpVelocity = -this.jumpPower;
-    }
+if (this.jumping)
+return;
+
+this.vy =
+this.jumpForce;
+
+this.jumping =
+true;
+
 }
+
 update() {
-    if (!this.jumping) return;
 
-    // Move
-    this.y += this.jumpVelocity;
+this.y += this.vy;
 
-    // Gravity
-    this.jumpVelocity += this.gravity;
+if (this.jumping) {
 
-    // Land
-    if (this.y >= this.groundLevel) {
-        this.y = this.groundLevel;
-        this.jumpVelocity = 0;
-        this.jumping = false;
-    }
+this.vy +=
+this.gravity;
+
 }
-            
-    draw(ctx) {
 
-    // Debug hitbox
-    ctx.strokeStyle = "#00AA00";
-   ctx.lineWidth = 2;
+if (
+this.y >=
+this.ground
+) {
 
+this.y =
+this.ground;
+
+this.vy =
+0;
+
+this.jumping =
+false;
+
+}
+
+}
+
+draw() {
+
+ctx.strokeStyle =
+"white";
+
+ctx.lineWidth = 2;
+
+// larger touch area
 ctx.strokeRect(
-    this.x,
-    this.y,
-    this.width,
-    this.height
+this.x - 10,
+this.y - 30,
+this.width + 20,
+this.height + 40
 );
 
-    ctx.font = "40px Arial";
-    ctx.textBaseline = "top";
-    ctx.fillText(
-        "🐸",
-        this.x,
-        this.y
-    );
+ctx.font =
+"42px Arial";
+
+ctx.textBaseline =
+"top";
+
+ctx.fillText(
+"🐸",
+this.x,
+this.y
+);
+
 }
 
-    getBounds() {
-        return {
-            x: this.x,
-            y: this.y,
-            width: this.width,
-            height: this.height
-        };
-    }
+bounds() {
+
+return {
+
+x:
+this.x,
+
+y:
+this.y,
+
+width:
+this.width,
+
+height:
+this.height
+
+};
+
 }
+
+touchBox() {
+
+return {
+
+x:
+this.x - 20,
+
+y:
+this.y - 40,
+
+width:
+this.width + 40,
+
+height:
+this.height + 60
+
+};
+
+}
+
+}
+
+// =========================
+// SNAKE
+// =========================
 
 class Snake {
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
-        this.width = 50;
-        this.height = 25;
-    }
 
-    draw(ctx) {
+constructor() {
 
-    // Debug hitbox
-    ctx.strokeStyle = "#FF6B6B";
-    ctx.strokeRect(
-        this.x,
-        this.y,
-        this.width,
-        this.height
-    );
+this.width = 55;
 
-    ctx.font = "30px Arial";
-    ctx.fillText(
-        "🐍",
-        this.x,
-        this.y + this.height
-    );
+this.height = 50;
+
+this.x =
+canvas.width - 120;
+
+this.y =
+GROUND_Y - this.height;
+
 }
 
-    getBounds() {
-        return {
-            x: this.x,
-            y: this.y,
-            width: this.width,
-            height: this.height
-        };
-    }
-}
+draw() {
 
-class Lotus {
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
-        this.width = 30;
-        this.height = 30;
-        this.speed = 2; // pixels per frame
-    }
+ctx.strokeStyle =
+"white";
 
-    update() {
-        this.x += this.speed;
-    }
-
-   draw(ctx) {
-
-    // Debug hitbox
-    ctx.strokeStyle = "#FFD93D";
-    ctx.strokeRect(
-        this.x,
-        this.y,
-        this.width,
-        this.height
-    );
-
-    ctx.font = "28px Arial";
-    ctx.fillText(
-        "🪷",
-        this.x,
-        this.y + this.height
-    );
-}
-
-    getBounds() {
-        return {
-            x: this.x,
-            y: this.y,
-            width: this.width,
-            height: this.height
-        };
-    }
-}
-
-// ============================================
-// 3. COLLISION DETECTION
-// ============================================
-
-function checkCollision(rect1, rect2) {
-    return (
-        rect1.x < rect2.x + rect2.width &&
-        rect1.x + rect1.width > rect2.x &&
-        rect1.y < rect2.y + rect2.height &&
-        rect1.y + rect1.height > rect2.y
-    );
-}
-
-// ============================================
-// 4. GAME STATE & INITIALIZATION
-// ============================================
-
-let gameState = {
-    running: false,
-    paused: false,
-    score: 0,
-    frog: null,
-    snake: null,
-    lotus: null,
-    lastSpawnTime: 0,
-    spawnInterval: 60, // frames between spawns
-};
-
-let input = {
-    jumpPressed: false,
-};
-
-// ============================================
-// 5. INPUT HANDLING
-// ============================================
-function handleJump() {
-    
-    if (gameState.running) {
-        gameState.frog.jump();
-    }
-}
-
-
-// Keyboard
-document.addEventListener("keydown", (e) => {
-    if (
-        e.code === "Space" ||
-        e.key === "ArrowUp" ||
-        e.key === "w"
-    ) {
-        e.preventDefault();
-        handleJump();
-    }
-});
-
-// Mouse
-canvas.addEventListener("click", handleJump);
-
-// Touch (MOST IMPORTANT)
-canvas.addEventListener(
-    "touchstart",
-    (e) => {
-        e.preventDefault();
-        handleJump();
-    },
-    { passive: false }
+ctx.strokeRect(
+this.x,
+this.y,
+this.width,
+this.height
 );
 
+ctx.font =
+"42px Arial";
 
-// ============================================
-// 6. GAME INITIALIZATION
-// ============================================
+ctx.textBaseline =
+"top";
 
-function initGame() {
-    gameState.running = true;
-    gameState.score = 0;
-    gameState.lastSpawnTime = 0;
-    
-    // Frog on right side, middle height
-    gameState.frog = new Frog(canvas.width - 100, canvas.height - 60);
-    
-    // Snake on left side, middle height
-    gameState.snake = new Snake(30, canvas.height - 55);
-    
-    // No lotus initially
-    gameState.lotus = null;
-    
-    gameLoop();
+ctx.fillText(
+"🐍",
+this.x,
+this.y
+);
+
 }
 
-// ============================================
-// 7. GAME LOGIC
-// ============================================
+bounds() {
 
-function spawnLotus() {
+return {
 
-    // Random vertical position
-    const spawnY =
-        Math.random() *
-        (canvas.height - 120) + 40;
+x:this.x,
+y:this.y,
+width:this.width,
+height:this.height
 
-    // Start from LEFT side
-    gameState.lotus =
-        new Lotus(
-            -gameState.frog.width,
-            spawnY
-        );
+};
+
 }
 
-
-function update() {
-    if (!gameState.running) return;   
-    gameState.frog.update();
-
-    // Spawn lotus if needed
-    gameState.lastSpawnTime++;
-    if (!gameState.lotus && gameState.lastSpawnTime > gameState.spawnInterval) {
-        spawnLotus();
-        gameState.lastSpawnTime = 0;
-    }
-
-    // Update lotus
-    if (gameState.lotus) {
-        gameState.lotus.update();
-
-        // Check collision: Frog + Lotus
-        if (checkCollision(gameState.frog.getBounds(), gameState.lotus.getBounds())) {
-            // Game over
-            gameState.running = false;
-            alert(`Game Over! Final Score: ${gameState.score}`);
-            homeScreen.style.display = "flex";
-            canvas.style.display = "none";
-            return;
-        }
-
-        // Check collision: Snake + Lotus (catch)
-        if (checkCollision(gameState.snake.getBounds(), gameState.lotus.getBounds())) {
-            gameState.lotus = null;
-            gameState.score += 10; // Reward for successfully dodging
-            gameState.lastSpawnTime = 0; // Reset spawn timer
-        }
-        
-       // Lotus left screen (frog dodged, snake missed)
-       if (gameState.lotus && gameState.lotus.x > canvas.width) {
-           gameState.lotus = null;
-           gameState.score += 5;
-           gameState.lastSpawnTime = 0;
-       }
-    }
 }
 
-// ============================================
-// 8. RENDERING
-// ============================================
+// =========================
+// LOTUS
+// =========================
 
-function draw() {
-    // 1.Clear canvas
-    ctx.fillStyle = "#E8F4F8";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+class Lotus {
 
-//2.Ground
-ctx.fillStyle = "#555";
-ctx.fillRect(0, canvas.height - 20, canvas.width, 20);
+constructor() {
 
-    // Draw entities
-    gameState.frog.draw(ctx);
-    gameState.snake.draw(ctx);
-    
-    if (gameState.lotus) {
-        gameState.lotus.draw(ctx);
-    }
+this.width = 40;
 
-    // Draw score
-    ctx.fillStyle = "#000";
-    ctx.font = "bold 20px Arial";
-    ctx.fillText(`Score: ${gameState.score}`, 20, 30);
+this.height = 40;
 
-    // Draw instructions
-    ctx.font = "14px Arial";
-    ctx.fillStyle = "#666";
-    ctx.fillText("Press SPACE / UP / W or CLICK to jump", 20, canvas.height - 10);
+this.x =
+-50;
+
+this.y =
+GROUND_Y -
+this.height;
+
+this.speed =
+5;
+
 }
 
-// ============================================
-// 9. GAME LOOP
-// ============================================
+update() {
 
-function gameLoop() {
-    if (!gameState.running) return;
+this.x +=
+this.speed;
 
-    update();
-    draw();
-    // Keep the loop running smoothly
-    requestAnimationFrame(gameLoop);
 }
 
-// ============================================
-// 10. UI EVENT LISTENERS
-// ============================================
+draw() {
 
-playBtn.addEventListener("click", () => {
-    homeScreen.style.display = "none";
-    canvas.style.display = "block";
-    initGame();
-});
+ctx.strokeStyle =
+"white";
+
+ctx.strokeRect(
+this.x,
+this.y,
+this.width,
+this.height
+);
+
+ctx.font =
+"36px Arial";
+
+ctx.textBaseline =
+"top";
+
+ctx.fillText(
+"🪷",
+this.x,
+this.y
+);
+
+}
+
+bounds() {
+
+return {
+
+x:this.x,
+y:this.y,
+width:this.width,
+height:this.height
+
+};
+
+}
+
+}
+
+// =========================
+// STATE
+// =========================
+
+const state = {
+
+running:false,
+
+score:0,
+
+spawn:0,
+
+spawnRate:90,
+
+frog:null,
+
+snake:null,
+
+lotus:null
+
+};
+
+// =========================
+// INPUT
+// =========================
+
+function jump() {
+
+if (
+state.running
+) {
+
+state.frog.jump();
+
+}
+
+}
+
+document.addEventListener(
+"keydown",
+e=>{
+
+if(
+e.code==="Space"||
+e.key==="ArrowUp"||
+e.key==="w"
+){
+
+e.preventDefault();
+
+jump();
+
+}
+
+}
+);
+
+canvas.addEventListener(
+"click",
+e=>{
+
+const r =
+canvas.getBoundingClientRect();
+
+const x =
+e.clientX-r.left;
+
+const y =
+e.clientY-r.top;
+
+if(
+hit(
+{
+x,
+y,
+width:1,
+height:1
+},
+state.frog.touchBox()
+)
+){
+
+jump();
+
+}
+
+}
+);
+
+canvas.addEventListener(
+"touchstart",
+e=>{
+
+e.preventDefault();
+
+jump();
+
+},
+{
+passive:false
+}
+);
+
+// =========================
+// GAME
+// =========================
+
+function spawnLotus(){
+
+state.lotus =
+new Lotus();
+
+}
+
+function update(){
+
+state.frog.update();
+
+state.spawn++;
+
+if(
+!state.lotus &&
+state.spawn >
+state.spawnRate
+){
+
+spawnLotus();
+
+state.spawn=0;
+
+}
+
+if(
+state.lotus
+){
+
+state.lotus.update();
+
+if(
+hit(
+state.frog.bounds(),
+state.lotus.bounds()
+)
+){
+
+state.running =
+false;
+
+setTimeout(
+()=>{
+
+alert(
+`Game Over\nScore ${state.score}`
+);
+
+homeScreen.style.display =
+"flex";
+
+canvas.style.display =
+"none";
+
+},
+50
+);
+
+}
+
+if(
+state.lotus &&
+hit(
+state.snake.bounds(),
+state.lotus.bounds()
+)
+){
+
+state.score += 10;
+
+state.lotus =
+null;
+
+}
+
+if(
+state.lotus &&
+state.lotus.x >
+canvas.width
+){
+
+state.score += 5;
+
+state.lotus =
+null;
+
+}
+
+}
+
+}
+
+function draw(){
+
+ctx.fillStyle =
+"#E8F4F8";
+
+ctx.fillRect(
+0,
+0,
+canvas.width,
+canvas.height
+);
+
+ctx.fillStyle =
+"#666";
+
+ctx.fillRect(
+0,
+GROUND_Y,
+canvas.width,
+3
+);
+
+state.frog.draw();
+
+state.snake.draw();
+
+if(
+state.lotus
+){
+
+state.lotus.draw();
+
+}
+
+ctx.fillStyle =
+"black";
+
+ctx.font =
+"bold 24px Arial";
+
+ctx.fillText(
+`Score: ${state.score}`,
+20,
+30
+);
+
+ctx.fillText(
+"Difficulty: 1.0x",
+canvas.width-220,
+30
+);
+
+ctx.font =
+"16px Arial";
+
+ctx.fillText(
+"Tap frog / Space to jump",
+20,
+canvas.height-20
+);
+
+}
+
+function loop(){
+
+if(
+!state.running
+)
+return;
+
+update();
+
+draw();
+
+requestAnimationFrame(
+loop
+);
+
+}
+
+function start(){
+
+state.running =
+true;
+
+state.score =
+0;
+
+state.spawn =
+0;
+
+state.frog =
+new Frog();
+
+state.snake =
+new Snake();
+
+state.lotus =
+null;
+
+loop();
+
+}
+
+playBtn.addEventListener(
+"click",
+()=>{
+
+homeScreen.style.display =
+"none";
+
+canvas.style.display =
+"block";
+
+start();
+
+}
+);
