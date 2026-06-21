@@ -1,106 +1,122 @@
-
 # 🐸 Frog Music Game
 
-![JavaScript](https://img.shields.io/badge/Code-JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
-![HTML](https://img.shields.io/badge/Markup-HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
-![CSS](https://img.shields.io/badge/Style-CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
-![Status](https://img.shields.io/badge/Status-In%20Development-orange?style=for-the-badge)
-![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)
+<p align="left">
+  <img src="https://cdn.simpleicons.org/unity/FFFFFF" height="36"/>
+  <img src="https://cdn.simpleicons.org/java/ED8B00" height="36"/>
+  <img src="https://cdn.simpleicons.org/javascript/F7DF1E" height="36"/>
+  <img src="https://cdn.simpleicons.org/html5/E34F26" height="36"/>
+  <img src="https://cdn.simpleicons.org/css/1572B6" height="36"/>
+  <img src="https://cdn.simpleicons.org/github/181717" height="36"/>
+</p>
 
-A **music-driven browser game** where a frog moves and reacts based on rhythm and player input.
+A small browser game prototype inspired by endless runners and built mainly as a **learning project**.
 
-This project explores how **game mechanics and music can interact**, creating a simple but engaging rhythm-based gameplay experience using JavaScript and Canvas.
+Instead of focusing on creating a perfect game immediately, this project was made to explore **game loops, collisions, animation, spawning systems, state management, and browser game development**.
 
----
-
-## 🎯 Idea
-
-Most beginner games are just movement-based.  
-This game is different:
-
-> Movement + Timing + Rhythm = Gameplay
-
-The frog doesn’t just move — it will eventually:
-- react to beats  
-- sync actions with rhythm  
-- create a music-based challenge system  
+The goal was to understand *how games work internally* before moving to larger engines like **Unity**.
 
 ---
 
-## 🚀 Current Features
+## 🎯 Why I Made This
 
-- Start screen UI (Play button system)
-- Game loop using `requestAnimationFrame`
-- Canvas-based rendering
-- Basic game structure setup
+I wanted to learn:
 
----
+- How a game loop continuously updates and renders
+- Collision detection between moving objects
+- Gravity and jump mechanics
+- Entity-based design (frog / snake / lotus)
+- Input handling (keyboard, mouse, touch)
+- Managing game state and score systems
+- Debugging movement and physics issues
+- Turning ideas into playable prototypes
 
-## 🛠️ Tech Stack
-
-- HTML
-- CSS
-- JavaScript
-- Canvas API
-
----
-
-## 🔄 Work in Progress
-
-- Frog movement system 🐸  
-- Gravity and jump mechanics  
-- Music sync system 🎵  
-- Rhythm-based scoring  
+This project is intentionally simple because the focus was **learning by building**.
 
 ---
 
-## 🎮 Future Vision
+## 🎮 Gameplay
 
-Planned upgrades:
+Avoid the incoming lotus and survive.
 
-- Beat-based obstacles  
-- Sound effects on jump  
-- Background music sync system  
-- Difficulty scaling with tempo  
-- Combo / rhythm scoring system  
+```text
+🪷 → → → → → 🐸 → 🐍
+```
 
----
-
-## 🧠 What I Learned
-
-- Game loop fundamentals
-- UI → Game state switching
-- Canvas rendering basics
-- Structuring a game project from scratch
+- Lotus appears from the left
+- Frog jumps to avoid collisions
+- Snake catches incoming lotus
+- Score increases over time
 
 ---
 
-## 📌 Project Goal
+## ✨ Features
 
-This project is part of my journey to:
-- Learn game development
-- Build interactive experiences
-- Explore music + gameplay mechanics
-
----
-
-## 🔮 Future Expansion
-
-A more advanced version of this game will be developed using **Unity** in a separate repository, focusing on:
-- Better physics
-- Advanced animations
-- Enhanced audio synchronization
-- Cross-platform support
+- 🐸 Frog jump mechanics
+- 🪷 Random lotus spawning
+- 🐍 Snake interaction
+- 🎯 Collision detection
+- 🧠 Game state management
+- 📈 Score tracking
+- ⌨️ Keyboard controls
+- 🖱️ Mouse controls
+- 📱 Touch support
+- 🧪 Debug hitboxes during development
 
 ---
 
-## ▶️ How to Run
+## 🛠 Tech Stack
 
-1. Clone the repo  
-2. Open `index.html` in your browser  
+| Technology | Purpose |
+|-----------|---------|
+| HTML | Structure |
+| CSS | Styling |
+| JavaScript | Game logic |
+| GitHub Pages | Hosting |
+| Unity *(planned)* | Future version |
 
 ---
 
-## 🌱 Status
+## 🚀 Future Ideas
 
-Early-stage project — actively being improved and expanded.
+- Rebuild in Unity
+- Add animations
+- Sound + music sync
+- Mobile optimization
+- Difficulty scaling
+- Better visuals
+- High score storage
+- Character skins
+
+---
+
+## ▶ Run Locally
+
+```bash
+git clone <repo-url>
+```
+
+Open:
+
+```text
+index.html
+```
+
+or use Live Server.
+
+---
+
+## 📚 What I Learned
+
+This project taught me that game development is less about graphics and more about:
+
+- update loops
+- physics tuning
+- collisions
+- debugging
+- iteration
+
+Prototype first. Improve later.
+
+```
+Made for learning and experimentation.
+```
