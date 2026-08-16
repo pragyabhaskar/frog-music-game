@@ -15,7 +15,7 @@ This project was created to understand how game systems work internally by build
 
 Rather than aiming for a polished game immediately, the focus was exploring **physics, collisions, rendering, spawning, state management, and gameplay architecture**.
 
-This prototype became my way of understanding why game engines like **Unity** exist and what problems they solve.
+This prototype became my way of understanding why game engines like **Godot** and **Unity** exist and what problems they solve.
 
 ---
 
