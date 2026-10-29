@@ -1,625 +1,423 @@
-// ======================================
-// FROG MUSIC GAME
-// ======================================
 
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
-canvas.width = 800;
-canvas.height = 400;
+const homeScreen = document.getElementById("homeScreen");
+const gameScreen = document.getElementById("gameScreen");
+const gameOverScreen = document.getElementById("gameOverScreen");
 
-const homeScreen =
-document.getElementById("homeScreen");
+const playBtn = document.getElementById("playBtn");
+const restartBtn = document.getElementById("restartBtn");
+const homeBtn = document.getElementById("homeBtn");
+const scoreLabel = document.getElementById("score");
+const finalScore = document.getElementById("finalScore");
+const gameMessage = document.getElementById("gameMessage");
 
-const playBtn =
-document.getElementById("playBtn");
+const W = canvas.width;
+const H = canvas.height;
+const GROUND = 370;
 
-const GROUND_Y =
-canvas.height - 80;
+// Game state
+let running = false;
+let animationId = null;
+let score = 0;
+let frame = 0;
+let obstacles = [];
+let nextObstacle = 90;
 
-// =========================
-// UTIL
-// =========================
+let frog;
+let snake;
 
-function hit(a, b) {
-return (
-a.x < b.x + b.width &&
-a.x + a.width > b.x &&
-a.y < b.y + b.height &&
-a.y + a.height > b.y
-);
+// --------------------------------------------------
+// START AND RESET
+// --------------------------------------------------
+
+function startGame() {
+    if (animationId !== null) {
+        cancelAnimationFrame(animationId);
+    }
+
+    score = 0;
+    frame = 0;
+    obstacles = [];
+    nextObstacle = 90;
+
+    frog = {
+        x: 210,
+        y: GROUND - 48,
+        width: 48,
+        height: 48,
+        velocityY: 0,
+        gravity: 0.75,
+        jumpForce: -15,
+        jumping: false
+    };
+
+    snake = {
+        x: 55,
+        y: GROUND - 43,
+        width: 65,
+        height: 43,
+        speed: 0.32
+    };
+
+    running = true;
+
+    homeScreen.classList.add("hidden");
+    gameOverScreen.classList.add("hidden");
+    gameScreen.classList.remove("hidden");
+
+    scoreLabel.textContent = "Score: 0";
+
+    draw();
+    animationId = requestAnimationFrame(loop);
 }
 
-// =========================
-// FROG
-// =========================
-
-class Frog {
-
-constructor() {
-
-this.width = 50;
-this.height = 50;
-
-this.x =
-canvas.width - 260;
-
-this.y =
-GROUND_Y - this.height;
-
-this.ground =
-this.y;
-
-this.vy = 0;
-
-this.gravity = 1.2;
-
-this.jumpForce = -18;
-
-this.jumping = false;
-
-}
-
-jump() {
-
-if (this.jumping)
-return;
-
-this.vy =
-this.jumpForce;
-
-this.jumping =
-true;
-
-}
-
-update() {
-
-this.y += this.vy;
-
-if (this.jumping) {
-
-this.vy +=
-this.gravity;
-
-}
-
-if (
-this.y >=
-this.ground
-) {
-
-this.y =
-this.ground;
-
-this.vy =
-0;
-
-this.jumping =
-false;
-
-}
-
-}
-
-draw() {
-
-ctx.strokeStyle =
-"white";
-
-ctx.lineWidth = 2;
-
-// larger touch area
-ctx.strokeRect(
-this.x - 10,
-this.y - 30,
-this.width + 20,
-this.height + 40
-);
-
-ctx.font =
-"42px Arial";
-
-ctx.textBaseline =
-"top";
-
-ctx.fillText(
-"🐸",
-this.x,
-this.y
-);
-
-}
-
-bounds() {
-
-return {
-
-x:
-this.x,
-
-y:
-this.y,
-
-width:
-this.width,
-
-height:
-this.height
-
-};
-
-}
-
-touchBox() {
-
-return {
-
-x:
-this.x - 20,
-
-y:
-this.y - 40,
-
-width:
-this.width + 40,
-
-height:
-this.height + 60
-
-};
-
-}
-
-}
-
-// =========================
-// SNAKE
-// =========================
-
-class Snake {
-
-constructor() {
-
-this.width = 55;
-
-this.height = 50;
-
-this.x =
-canvas.width - 120;
-
-this.y =
-GROUND_Y - this.height;
-
-}
-
-draw() {
-
-ctx.strokeStyle =
-"white";
-
-ctx.strokeRect(
-this.x,
-this.y,
-this.width,
-this.height
-);
-
-ctx.font =
-"42px Arial";
-
-ctx.textBaseline =
-"top";
-
-ctx.fillText(
-"🐍",
-this.x,
-this.y
-);
-
-}
-
-bounds() {
-
-return {
-
-x:this.x,
-y:this.y,
-width:this.width,
-height:this.height
-
-};
-
-}
-
-}
-
-// =========================
-// LOTUS
-// =========================
-
-class Lotus {
-
-constructor() {
-
-this.width = 40;
-
-this.height = 40;
-
-this.x =
--50;
-
-this.y =
-GROUND_Y -
-this.height;
-
-this.speed =
-5;
-
-}
-
-update() {
-
-this.x +=
-this.speed;
-
-}
-
-draw() {
-
-ctx.strokeStyle =
-"white";
-
-ctx.strokeRect(
-this.x,
-this.y,
-this.width,
-this.height
-);
-
-ctx.font =
-"36px Arial";
-
-ctx.textBaseline =
-"top";
-
-ctx.fillText(
-"🪷",
-this.x,
-this.y
-);
-
-}
-
-bounds() {
-
-return {
-
-x:this.x,
-y:this.y,
-width:this.width,
-height:this.height
-
-};
-
-}
-
-}
-
-// =========================
-// STATE
-// =========================
-
-const state = {
-
-running:false,
-
-score:0,
-
-spawn:0,
-
-spawnRate:90,
-
-frog:null,
-
-snake:null,
-
-lotus:null
-
-};
-
-// =========================
-// INPUT
-// =========================
+// --------------------------------------------------
+// FROG JUMP
+// --------------------------------------------------
 
 function jump() {
+    if (!running || frog.jumping) return;
 
-if (
-state.running
-) {
-
-state.frog.jump();
-
+    frog.velocityY = frog.jumpForce;
+    frog.jumping = true;
 }
 
+document.addEventListener("keydown", function (event) {
+    if (
+        event.code === "Space" ||
+        event.code === "ArrowUp" ||
+        event.key.toLowerCase() === "w"
+    ) {
+        if (running) {
+            event.preventDefault();
+            jump();
+        }
+    }
+});
+
+canvas.addEventListener("pointerdown", function (event) {
+    if (!running) return;
+
+    event.preventDefault();
+    jump();
+});
+
+// --------------------------------------------------
+// LOTUS OBSTACLES
+// --------------------------------------------------
+
+function spawnLotus() {
+    obstacles.push({
+        x: W + 20,
+        y: GROUND - 43,
+        width: 45,
+        height: 43,
+        counted: false
+    });
 }
 
-document.addEventListener(
-"keydown",
-e=>{
+// --------------------------------------------------
+// COLLISION DETECTION
+// --------------------------------------------------
 
-if(
-e.code==="Space"||
-e.key==="ArrowUp"||
-e.key==="w"
-){
-
-e.preventDefault();
-
-jump();
-
+function overlaps(a, b) {
+    return (
+        a.x + 8 < b.x + b.width - 7 &&
+        a.x + a.width - 8 > b.x + 7 &&
+        a.y + 6 < b.y + b.height &&
+        a.y + a.height - 5 > b.y + 8
+    );
 }
 
-}
-);
+// --------------------------------------------------
+// UPDATE GAME
+// --------------------------------------------------
 
-canvas.addEventListener(
-"click",
-e=>{
+function update() {
+    frame++;
 
-const r =
-canvas.getBoundingClientRect();
+    // Apply gravity to the frog
+    frog.y += frog.velocityY;
+    frog.velocityY += frog.gravity;
 
-const x =
-e.clientX-r.left;
+    // Land back on the pond
+    const floorY = GROUND - frog.height;
 
-const y =
-e.clientY-r.top;
+    if (frog.y >= floorY) {
+        frog.y = floorY;
+        frog.velocityY = 0;
+        frog.jumping = false;
+    }
 
-if(
-hit(
-{
-x,
-y,
-width:1,
-height:1
-},
-state.frog.touchBox()
-)
-){
+    // Spawn lotus obstacles
+    nextObstacle--;
 
-jump();
+    if (nextObstacle <= 0) {
+        spawnLotus();
 
-}
+        // Gradually make the game more challenging
+        nextObstacle = Math.max(
+            65,
+            105 - Math.floor(score / 30)
+        );
+    }
 
-}
-);
+    // Move obstacles towards the frog
+    const obstacleSpeed = Math.min(6, 3.5 + score / 100);
 
-canvas.addEventListener(
-"touchstart",
-e=>{
+    for (const lotus of obstacles) {
+        lotus.x -= obstacleSpeed;
 
-e.preventDefault();
+        if (!lotus.counted && lotus.x + lotus.width < frog.x) {
+            lotus.counted = true;
+            score += 10;
 
-jump();
+            // Successfully dodging a lotus gives the frog
+            // a little more distance from the snake.
+            snake.x = Math.max(35, snake.x - 18);
+        }
 
-},
-{
-passive:false
-}
-);
+        if (overlaps(frog, lotus)) {
+            endGame("A lotus got in your way!");
+            return;
+        }
+    }
 
-// =========================
-// GAME
-// =========================
+    // Remove obstacles that have left the screen
+    obstacles = obstacles.filter(
+        lotus => lotus.x + lotus.width > -10
+    );
 
-function spawnLotus(){
+    // The snake slowly chases the frog
+    snake.x += snake.speed + score / 2500;
 
-state.lotus =
-new Lotus();
+    // The snake catches the frog
+    if (snake.x + snake.width - 8 >= frog.x + 5) {
+        endGame("The snake caught you!");
+        return;
+    }
 
-}
-
-function update(){
-
-state.frog.update();
-
-state.spawn++;
-
-if(
-!state.lotus &&
-state.spawn >
-state.spawnRate
-){
-
-spawnLotus();
-
-state.spawn=0;
-
+    scoreLabel.textContent = "Score: " + score;
 }
 
-if(
-state.lotus
-){
+// --------------------------------------------------
+// DRAW THE POND
+// --------------------------------------------------
 
-state.lotus.update();
+function drawBackground() {
+    // Sky
+    const sky = ctx.createLinearGradient(0, 0, 0, GROUND);
+    sky.addColorStop(0, "#baf0d6");
+    sky.addColorStop(1, "#66c9b1");
 
-if(
-hit(
-state.frog.bounds(),
-state.lotus.bounds()
-)
-){
+    ctx.fillStyle = sky;
+    ctx.fillRect(0, 0, W, H);
 
-state.running =
-false;
+    // Distant bushes
+    ctx.fillStyle = "#7cc99a";
 
-setTimeout(
-()=>{
+    for (let i = 0; i < 8; i++) {
+        const x = i * 135 - 20;
 
-alert(
-`Game Over\nScore ${state.score}`
-);
+        ctx.beginPath();
+        ctx.arc(x, 185 + (i % 2) * 15, 65, Math.PI, 0);
+        ctx.fill();
+    }
 
-homeScreen.style.display =
-"flex";
+    // Pond water
+    const water = ctx.createLinearGradient(0, GROUND, 0, H);
+    water.addColorStop(0, "#55c7c1");
+    water.addColorStop(1, "#258eaa");
 
-canvas.style.display =
-"none";
+    ctx.fillStyle = water;
+    ctx.fillRect(0, GROUND, W, H - GROUND);
 
-},
-50
-);
+    // Water ripples
+    ctx.strokeStyle = "rgba(255,255,255,0.35)";
+    ctx.lineWidth = 2;
 
+    for (let i = 0; i < 9; i++) {
+        const x = (i * 117 + frame * 0.6) % W;
+        const y = GROUND + 35 + (i % 3) * 32;
+
+        ctx.beginPath();
+        ctx.ellipse(x, y, 24, 5, 0, 0, Math.PI * 2);
+        ctx.stroke();
+    }
+
+    // Pond edge
+    ctx.fillStyle = "#398e5c";
+    ctx.fillRect(0, GROUND - 8, W, 12);
+
+    ctx.fillStyle = "#a4df7b";
+    ctx.fillRect(0, GROUND - 8, W, 5);
+
+    // Decorative lily pads
+    for (let i = 0; i < 6; i++) {
+        const x = (i * 165 + 40) % W;
+        const y = GROUND + 25 + (i % 2) * 65;
+
+        ctx.fillStyle = "#278e68";
+        ctx.beginPath();
+        ctx.ellipse(x, y, 24, 10, 0, 0.3, Math.PI * 1.8);
+        ctx.lineTo(x, y);
+        ctx.fill();
+    }
+
+    // Sun
+    ctx.fillStyle = "#fff0a0";
+    ctx.beginPath();
+    ctx.arc(815, 65, 34, 0, Math.PI * 2);
+    ctx.fill();
 }
 
-if(
-state.lotus &&
-hit(
-state.snake.bounds(),
-state.lotus.bounds()
-)
-){
+// --------------------------------------------------
+// DRAW CHARACTERS AND OBSTACLES
+// --------------------------------------------------
 
-state.score += 10;
+function drawFrog() {
+    // Shadow
+    ctx.fillStyle = "rgba(0,0,0,0.15)";
+    ctx.beginPath();
+    ctx.ellipse(
+        frog.x + 24,
+        GROUND - 3,
+        frog.jumping ? 18 : 27,
+        6,
+        0,
+        0,
+        Math.PI * 2
+    );
+    ctx.fill();
 
-state.lotus =
-null;
-
+    // Frog emoji
+    ctx.font = "46px Arial";
+    ctx.textBaseline = "top";
+    ctx.fillText("🐸", frog.x, frog.y);
 }
 
-if(
-state.lotus &&
-state.lotus.x >
-canvas.width
-){
+function drawSnake() {
+    // Draw a curved green body
+    ctx.strokeStyle = "#24783e";
+    ctx.lineWidth = 24;
+    ctx.lineCap = "round";
 
-state.score += 5;
+    ctx.beginPath();
+    ctx.moveTo(snake.x + 8, snake.y + 34);
+    ctx.quadraticCurveTo(
+        snake.x + 28,
+        snake.y + 5,
+        snake.x + 48,
+        snake.y + 30
+    );
+    ctx.stroke();
 
-state.lotus =
-null;
-
+    // Snake head
+    ctx.font = "38px Arial";
+    ctx.textBaseline = "top";
+    ctx.fillText("🐍", snake.x + 23, snake.y - 3);
 }
 
+function drawLotus(lotus) {
+    // Shadow on water
+    ctx.fillStyle = "rgba(0,0,0,0.12)";
+    ctx.beginPath();
+    ctx.ellipse(
+        lotus.x + 23,
+        GROUND - 2,
+        25,
+        6,
+        0,
+        0,
+        Math.PI * 2
+    );
+    ctx.fill();
+
+    // Lotus flower
+    ctx.font = "40px Arial";
+    ctx.textBaseline = "top";
+    ctx.fillText("🪷", lotus.x, lotus.y);
 }
 
+// --------------------------------------------------
+// DRAW ENTIRE FRAME
+// --------------------------------------------------
+
+function draw() {
+    drawBackground();
+
+    for (const lotus of obstacles) {
+        drawLotus(lotus);
+    }
+
+    drawSnake();
+    drawFrog();
+
+    // Score inside the game
+    ctx.fillStyle = "#124d3b";
+    ctx.font = "bold 23px Arial";
+    ctx.textBaseline = "top";
+    ctx.fillText("Score: " + score, 22, 20);
+
+    // Controls hint
+    ctx.fillStyle = "rgba(255,255,255,0.9)";
+    ctx.font = "16px Arial";
+    ctx.fillText("JUMP!", 22, 52);
 }
 
-function draw(){
+// --------------------------------------------------
+// GAME LOOP
+// --------------------------------------------------
 
-ctx.fillStyle =
-"#E8F4F8";
+function loop() {
+    if (!running) return;
 
-ctx.fillRect(
-0,
-0,
-canvas.width,
-canvas.height
-);
+    update();
 
-ctx.fillStyle =
-"#666";
+    if (!running) return;
 
-ctx.fillRect(
-0,
-GROUND_Y,
-canvas.width,
-3
-);
+    draw();
 
-state.frog.draw();
-
-state.snake.draw();
-
-if(
-state.lotus
-){
-
-state.lotus.draw();
-
+    animationId = requestAnimationFrame(loop);
 }
 
-ctx.fillStyle =
-"black";
+// --------------------------------------------------
+// GAME OVER
+// --------------------------------------------------
 
-ctx.font =
-"bold 24px Arial";
+function endGame(message) {
+    running = false;
 
-ctx.fillText(
-`Score: ${state.score}`,
-20,
-30
-);
+    if (animationId !== null) {
+        cancelAnimationFrame(animationId);
+        animationId = null;
+    }
 
-ctx.fillText(
-"Difficulty: 1.0x",
-canvas.width-220,
-30
-);
+    finalScore.textContent = "Your score: " + score;
+    gameMessage.textContent = message;
 
-ctx.font =
-"16px Arial";
-
-ctx.fillText(
-"Tap frog / Space to jump",
-20,
-canvas.height-20
-);
-
+    gameScreen.classList.add("hidden");
+    gameOverScreen.classList.remove("hidden");
 }
 
-function loop(){
+// --------------------------------------------------
+// BUTTONS
+// --------------------------------------------------
 
-if(
-!state.running
-)
-return;
+playBtn.addEventListener("click", startGame);
+restartBtn.addEventListener("click", startGame);
 
-update();
+homeBtn.addEventListener("click", function () {
+    running = false;
 
-draw();
+    if (animationId !== null) {
+        cancelAnimationFrame(animationId);
+        animationId = null;
+    }
 
-requestAnimationFrame(
-loop
-);
-
-}
-
-function start(){
-
-state.running =
-true;
-
-state.score =
-0;
-
-state.spawn =
-0;
-
-state.frog =
-new Frog();
-
-state.snake =
-new Snake();
-
-state.lotus =
-null;
-
-loop();
-
-}
-
-playBtn.addEventListener(
-"click",
-()=>{
-
-homeScreen.style.display =
-"none";
-
-canvas.style.display =
-"block";
-
-start();
-
-}
-);
+    gameOverScreen.classList.add("hidden");
+    gameScreen.classList.add("hidden");
+    homeScreen.classList.remove("hidden");
+});
