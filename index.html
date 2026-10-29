@@ -73,7 +73,7 @@ button:hover { background: #126b3b; }
     <div style="font-size:70px">🐸</div>
     <h1>Frog Pond Adventure</h1>
     <p>Jump over the lotuses. Don't let the snake catch you!</p>
-    <button id="play" onclick="window.startGame()">▶ Play Game</button>
+    <button id="play">▶ Play Game</button>
     <p class="hint">SPACE / ↑ / W / Tap to jump</p>
 </section>
 
@@ -83,13 +83,13 @@ button:hover { background: #126b3b; }
         <span id="score">Score: 0</span>
     </div>
     <canvas id="game" width="900" height="500"></canvas>
-    <p class="hint">Press SPACE or tap the pond to jump!</p>
+    <p class="hint">Press SPACE, ↑ or W, or tap the pond to jump!</p>
 </section>
 
 <section id="over" class="screen hidden">
     <div style="font-size:70px">🐸</div>
     <h1>Game Over!</h1>
-    <p id="finalScore">Score: 0</p>
+    <p id="finalScore">Your score: 0</p>
     <p id="message"></p>
     <button id="restart">🔄 Play Again</button>
     <button id="homeBtn">⌂ Home</button>
@@ -122,16 +122,20 @@ button:hover { background: #126b3b; }
 
         score = 0;
         frame = 0;
-        spawnTimer = 65;
+        spawnTimer = 75;
         lotuses = [];
 
         frog = {
-            x: 220, y: GROUND - 48,
-            w: 44, h: 44,
-            vy: 0, jumping: false
+            x: 220,
+            y: GROUND - 44,
+            w: 44,
+            h: 44,
+            vy: 0,
+            jumping: false
         };
 
-        snake = { x: 45, w: 60 };
+        // The snake begins behind the frog.
+        snake = { x: 35, w: 48 };
 
         running = true;
         $("score").textContent = "Score: 0";
@@ -143,6 +147,7 @@ button:hover { background: #126b3b; }
 
     function jump() {
         if (!running || frog.jumping) return;
+
         frog.vy = -14;
         frog.jumping = true;
     }
@@ -165,6 +170,62 @@ button:hover { background: #126b3b; }
         showScreen("over");
     }
 
+    // Draw a lotus using canvas shapes instead of an emoji.
+    function drawLotus(flower) {
+        const cx = flower.x + flower.w / 2;
+        const cy = flower.y + 23;
+
+        ctx.save();
+
+        // Lily pad
+        ctx.fillStyle = "#268b61";
+        ctx.beginPath();
+        ctx.ellipse(cx, cy + 9, 23, 9, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Outer petals
+        for (let i = 0; i < 8; i++) {
+            const angle = i * Math.PI * 2 / 8;
+
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate(angle);
+
+            ctx.fillStyle =
+                i % 2 === 0 ? "#ff80b5" : "#ed5796";
+
+            ctx.beginPath();
+            ctx.ellipse(0, -9, 6, 13, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        // Inner petals
+        for (let i = 0; i < 5; i++) {
+            const angle = i * Math.PI * 2 / 5;
+
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate(angle);
+
+            ctx.fillStyle = "#ffc0dc";
+            ctx.beginPath();
+            ctx.ellipse(0, -5, 4, 8, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        // Golden centre
+        ctx.fillStyle = "#ffe56b";
+        ctx.beginPath();
+        ctx.arc(cx, cy, 4, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.restore();
+    }
+
     function update() {
         frame++;
 
@@ -173,14 +234,16 @@ button:hover { background: #126b3b; }
         frog.vy += 0.7;
 
         const floor = GROUND - frog.h;
+
         if (frog.y >= floor) {
             frog.y = floor;
             frog.vy = 0;
             frog.jumping = false;
         }
 
-        // Create obstacles
+        // Create lotus obstacles
         spawnTimer--;
+
         if (spawnTimer <= 0) {
             lotuses.push({
                 x: W + 10,
@@ -191,13 +254,14 @@ button:hover { background: #126b3b; }
             });
 
             spawnTimer = Math.max(
-                65, 105 - Math.floor(score / 30)
+                85,
+                115 - Math.floor(score / 40)
             );
         }
 
-        // Move lotuses and check collisions
-        const speed = Math.min(6, 3.5 + score / 150);
+        const speed = Math.min(6, 3.5 + score / 250);
 
+        // Move obstacles and check collisions
         for (const flower of lotuses) {
             flower.x -= speed;
 
@@ -206,16 +270,26 @@ button:hover { background: #126b3b; }
                 return;
             }
 
-            if (!flower.passed && flower.x + flower.w < frog.x) {
+            // Successfully passing a lotus earns points
+            // and pushes the snake backwards.
+            if (
+                !flower.passed &&
+                flower.x + flower.w < frog.x
+            ) {
                 flower.passed = true;
                 score += 10;
+
+                snake.x = Math.max(0, snake.x - 65);
             }
         }
 
-        lotuses = lotuses.filter(f => f.x + f.w > -10);
+        lotuses = lotuses.filter(
+            flower => flower.x + flower.w > -10
+        );
 
-        // Snake slowly chases the frog
-        snake.x += 0.16 + score / 5000;
+        // The snake slowly chases the frog.
+        // Its speed increases gradually as the score grows.
+        snake.x += 0.10 + Math.min(0.12, score / 10000);
 
         if (snake.x + snake.w > frog.x + 4) {
             endGame("The snake caught you!");
@@ -223,7 +297,9 @@ button:hover { background: #126b3b; }
         }
 
         // Survival points
-        if (frame % 6 === 0) score++;
+        if (frame % 6 === 0) {
+            score++;
+        }
 
         $("score").textContent = "Score: " + score;
     }
@@ -233,11 +309,13 @@ button:hover { background: #126b3b; }
         const sky = ctx.createLinearGradient(0, 0, 0, GROUND);
         sky.addColorStop(0, "#c6f4d9");
         sky.addColorStop(1, "#70cbb0");
+
         ctx.fillStyle = sky;
         ctx.fillRect(0, 0, W, H);
 
         // Bushes
         ctx.fillStyle = "#80c99a";
+
         for (let i = 0; i < 8; i++) {
             ctx.beginPath();
             ctx.arc(i * 135, 195, 65, Math.PI, 0);
@@ -247,17 +325,21 @@ button:hover { background: #126b3b; }
         // Pond
         ctx.fillStyle = "#299eaf";
         ctx.fillRect(0, GROUND, W, H - GROUND);
+
         ctx.fillStyle = "#398e5c";
         ctx.fillRect(0, GROUND - 8, W, 12);
+
         ctx.fillStyle = "#a4df7b";
         ctx.fillRect(0, GROUND - 8, W, 5);
 
         // Water ripples
         ctx.strokeStyle = "#a8f4ed";
         ctx.lineWidth = 2;
+
         for (let i = 0; i < 9; i++) {
             const x = (i * 117 + frame * 0.6) % W;
             const y = GROUND + 35 + (i % 3) * 32;
+
             ctx.beginPath();
             ctx.ellipse(x, y, 22, 5, 0, 0, Math.PI * 2);
             ctx.stroke();
@@ -269,10 +351,11 @@ button:hover { background: #126b3b; }
         ctx.arc(815, 65, 32, 0, Math.PI * 2);
         ctx.fill();
 
-        // Lily pads
+        // Decorative lily pads
         for (let i = 0; i < 6; i++) {
             const x = (i * 165 + 40) % W;
             const y = GROUND + 25 + (i % 2) * 65;
+
             ctx.fillStyle = "#278e68";
             ctx.beginPath();
             ctx.ellipse(x, y, 24, 10, 0, 0, Math.PI * 1.8);
@@ -280,24 +363,23 @@ button:hover { background: #126b3b; }
             ctx.fill();
         }
 
-        // Lotus obstacles
-        ctx.font = "40px Arial";
-        ctx.textBaseline = "top";
+        // Draw the moving lotus obstacles.
         for (const flower of lotuses) {
-            ctx.fillText("🪷", flower.x, flower.y);
+            drawLotus(flower);
         }
 
         // Snake
         ctx.font = "48px Arial";
-        ctx.fillText("🐍", snake.x, GROUND - 47);
+        ctx.textBaseline = "alphabetic";
+        ctx.fillText("🐍", snake.x, GROUND - 7);
 
         // Frog
-        ctx.fillText("🐸", frog.x, frog.y);
+        ctx.fillText("🐸", frog.x, frog.y + frog.h);
 
-        // Score
+        // Score on the canvas
         ctx.fillStyle = "#124d3b";
         ctx.font = "bold 23px Arial";
-        ctx.fillText("Score: " + score, 22, 20);
+        ctx.fillText("Score: " + score, 22, 30);
     }
 
     function loop() {
@@ -311,6 +393,7 @@ button:hover { background: #126b3b; }
         frameId = requestAnimationFrame(loop);
     }
 
+    // One click handler per button.
     $("play").addEventListener("click", startGame);
     $("restart").addEventListener("click", startGame);
 
@@ -320,6 +403,7 @@ button:hover { background: #126b3b; }
         showScreen("home");
     });
 
+    // Keyboard controls
     document.addEventListener("keydown", event => {
         if (["Space", "ArrowUp", "KeyW"].includes(event.code)) {
             if (running) {
@@ -329,16 +413,15 @@ button:hover { background: #126b3b; }
         }
     });
 
+    // Mouse and touchscreen controls
     canvas.addEventListener("pointerdown", event => {
         if (!running) return;
+
         event.preventDefault();
         jump();
     });
 
     showScreen("home");
-
-window.startGame = startGame;
-
 })();
 </script>
 
