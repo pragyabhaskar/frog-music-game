@@ -1,34 +1,44 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🐸 Frog Music Game</title>
+    <title>Frog Pond Adventure</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
-
 <body>
 
-<div id="homeScreen">
-    <h1>🐸 Frog Music Game</h1>
-    <p>Dodge lotuses to help the snake catch them!</p>
-    <button id="playBtn">▶️ Play</button>
-</div>
+    <main id="homeScreen" class="screen">
+        <div class="title-icon">🐸</div>
+        <h1>Frog Pond Adventure</h1>
+        <p>Jump over the lotuses. Don't let the snake catch you!</p>
+        <button id="playBtn">▶ Play Game</button>
+        <p class="instructions">SPACE / ↑ / W / Tap to jump</p>
+    </main>
 
-<canvas id="game"></canvas>
+    <main id="gameScreen" class="screen hidden">
+        <div class="game-header">
+            <span>🐸 Pond Adventure</span>
+            <span id="score">Score: 0</span>
+        </div>
 
-<!-- Entity Scripts -->
-<script src="src/mechanics/entities/Frog.js"></script>
-<script src="src/mechanics/entities/Snake.js"></script>
-<script src="src/mechanics/entities/Lotus.js"></script>
+        <canvas id="game" width="900" height="500"></canvas>
 
-<!-- System Scripts -->
-<script src="src/mechanics/collision/CollisionDetector.js"></script>
-<script src="src/mechanics/input/InputHandler.js"></script>
-<script src="src/mechanics/scoring/ScoreManager.js"></script>
+        <p class="instructions">
+            Press SPACE or tap the pond to jump!
+        </p>
+    </main>
 
-<!-- Main Game Script -->
-<script src="src/main.js"></script>
+    <main id="gameOverScreen" class="screen hidden">
+        <div class="title-icon">🐸</div>
+        <h1>Game Over!</h1>
+        <p id="finalScore">Your score: 0</p>
+        <p id="gameMessage">The pond adventure is over!</p>
+        <button id="restartBtn">🔄 Play Again</button>
+        <button id="homeBtn" class="secondary">⌂ Home</button>
+    </main>
 
+    <script src="src/main.js"></script>
 </body>
 </html>
