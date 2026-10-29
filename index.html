@@ -73,7 +73,7 @@ button:hover { background: #126b3b; }
     <div style="font-size:70px">🐸</div>
     <h1>Frog Pond Adventure</h1>
     <p>Jump over the lotuses. Don't let the snake catch you!</p>
-    <button id="play">▶ Play Game</button>
+    <button id="play" onclick="window.startGame()">▶ Play Game</button>
     <p class="hint">SPACE / ↑ / W / Tap to jump</p>
 </section>
 
@@ -336,6 +336,9 @@ button:hover { background: #126b3b; }
     });
 
     showScreen("home");
+
+window.startGame = startGame;
+
 })();
 </script>
 
