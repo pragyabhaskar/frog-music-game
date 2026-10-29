@@ -2,43 +2,342 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Frog Pond Adventure</title>
-    <link rel="stylesheet" href="css/style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Frog Pond Adventure</title>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    color: #174b3a;
+    background: linear-gradient(#dff8e8, #9bd8b5);
+}
+
+.screen {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+
+.hidden { display: none !important; }
+
+h1 { font-size: clamp(30px, 6vw, 48px); }
+
+button {
+    padding: 14px 28px;
+    margin: 8px;
+    border: 0;
+    border-radius: 12px;
+    background: #218c54;
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover { background: #126b3b; }
+
+#game {
+    display: block;
+    width: min(900px, 96vw);
+    height: auto;
+    border: 4px solid #27785c;
+    border-radius: 12px;
+    touch-action: manipulation;
+}
+
+.header {
+    width: min(900px, 96vw);
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    font-size: 20px;
+    margin-bottom: 8px;
+}
+
+.hint { font-size: 14px; }
+</style>
 </head>
+
 <body>
 
-    <main id="homeScreen" class="screen">
-        <div class="title-icon">🐸</div>
-        <h1>Frog Pond Adventure</h1>
-        <p>Jump over the lotuses. Don't let the snake catch you!</p>
-        <button id="playBtn">▶ Play Game</button>
-        <p class="instructions">SPACE / ↑ / W / Tap to jump</p>
-    </main>
+<section id="home" class="screen">
+    <div style="font-size:70px">🐸</div>
+    <h1>Frog Pond Adventure</h1>
+    <p>Jump over the lotuses. Don't let the snake catch you!</p>
+    <button id="play">▶ Play Game</button>
+    <p class="hint">SPACE / ↑ / W / Tap to jump</p>
+</section>
 
-    <main id="gameScreen" class="screen hidden">
-        <div class="game-header">
-            <span>🐸 Pond Adventure</span>
-            <span id="score">Score: 0</span>
-        </div>
+<section id="gameScreen" class="screen hidden">
+    <div class="header">
+        <span>🐸 Pond Adventure</span>
+        <span id="score">Score: 0</span>
+    </div>
+    <canvas id="game" width="900" height="500"></canvas>
+    <p class="hint">Press SPACE or tap the pond to jump!</p>
+</section>
 
-        <canvas id="game" width="900" height="500"></canvas>
+<section id="over" class="screen hidden">
+    <div style="font-size:70px">🐸</div>
+    <h1>Game Over!</h1>
+    <p id="finalScore">Score: 0</p>
+    <p id="message"></p>
+    <button id="restart">🔄 Play Again</button>
+    <button id="homeBtn">⌂ Home</button>
+</section>
 
-        <p class="instructions">
-            Press SPACE or tap the pond to jump!
-        </p>
-    </main>
+<script>
+(() => {
+    const $ = id => document.getElementById(id);
+    const canvas = $("game");
+    const ctx = canvas.getContext("2d");
 
-    <main id="gameOverScreen" class="screen hidden">
-        <div class="title-icon">🐸</div>
-        <h1>Game Over!</h1>
-        <p id="finalScore">Your score: 0</p>
-        <p id="gameMessage">The pond adventure is over!</p>
-        <button id="restartBtn">🔄 Play Again</button>
-        <button id="homeBtn" class="secondary">⌂ Home</button>
-    </main>
+    const W = canvas.width;
+    const H = canvas.height;
+    const GROUND = 370;
 
-    <script src="src/main.js"></script>
+    let running = false;
+    let frameId = 0;
+    let frame = 0;
+    let score = 0;
+    let frog, snake, lotuses, spawnTimer;
+
+    function showScreen(name) {
+        $("home").classList.toggle("hidden", name !== "home");
+        $("gameScreen").classList.toggle("hidden", name !== "game");
+        $("over").classList.toggle("hidden", name !== "over");
+    }
+
+    function startGame() {
+        cancelAnimationFrame(frameId);
+
+        score = 0;
+        frame = 0;
+        spawnTimer = 65;
+        lotuses = [];
+
+        frog = {
+            x: 220, y: GROUND - 48,
+            w: 44, h: 44,
+            vy: 0, jumping: false
+        };
+
+        snake = { x: 45, w: 60 };
+
+        running = true;
+        $("score").textContent = "Score: 0";
+        showScreen("game");
+
+        draw();
+        frameId = requestAnimationFrame(loop);
+    }
+
+    function jump() {
+        if (!running || frog.jumping) return;
+        frog.vy = -14;
+        frog.jumping = true;
+    }
+
+    function overlaps(a, b) {
+        return a.x + 8 < b.x + b.w - 5 &&
+               a.x + a.w - 8 > b.x + 5 &&
+               a.y + 5 < b.y + b.h - 5 &&
+               a.y + a.h - 5 > b.y + 8;
+    }
+
+    function endGame(reason) {
+        if (!running) return;
+
+        running = false;
+        cancelAnimationFrame(frameId);
+
+        $("finalScore").textContent = "Your score: " + score;
+        $("message").textContent = reason;
+        showScreen("over");
+    }
+
+    function update() {
+        frame++;
+
+        // Frog movement and gravity
+        frog.y += frog.vy;
+        frog.vy += 0.7;
+
+        const floor = GROUND - frog.h;
+        if (frog.y >= floor) {
+            frog.y = floor;
+            frog.vy = 0;
+            frog.jumping = false;
+        }
+
+        // Create obstacles
+        spawnTimer--;
+        if (spawnTimer <= 0) {
+            lotuses.push({
+                x: W + 10,
+                y: GROUND - 42,
+                w: 42,
+                h: 42,
+                passed: false
+            });
+
+            spawnTimer = Math.max(
+                65, 105 - Math.floor(score / 30)
+            );
+        }
+
+        // Move lotuses and check collisions
+        const speed = Math.min(6, 3.5 + score / 150);
+
+        for (const flower of lotuses) {
+            flower.x -= speed;
+
+            if (overlaps(frog, flower)) {
+                endGame("You bumped into a lotus!");
+                return;
+            }
+
+            if (!flower.passed && flower.x + flower.w < frog.x) {
+                flower.passed = true;
+                score += 10;
+            }
+        }
+
+        lotuses = lotuses.filter(f => f.x + f.w > -10);
+
+        // Snake slowly chases the frog
+        snake.x += 0.16 + score / 5000;
+
+        if (snake.x + snake.w > frog.x + 4) {
+            endGame("The snake caught you!");
+            return;
+        }
+
+        // Survival points
+        if (frame % 6 === 0) score++;
+
+        $("score").textContent = "Score: " + score;
+    }
+
+    function draw() {
+        // Sky
+        const sky = ctx.createLinearGradient(0, 0, 0, GROUND);
+        sky.addColorStop(0, "#c6f4d9");
+        sky.addColorStop(1, "#70cbb0");
+        ctx.fillStyle = sky;
+        ctx.fillRect(0, 0, W, H);
+
+        // Bushes
+        ctx.fillStyle = "#80c99a";
+        for (let i = 0; i < 8; i++) {
+            ctx.beginPath();
+            ctx.arc(i * 135, 195, 65, Math.PI, 0);
+            ctx.fill();
+        }
+
+        // Pond
+        ctx.fillStyle = "#299eaf";
+        ctx.fillRect(0, GROUND, W, H - GROUND);
+        ctx.fillStyle = "#398e5c";
+        ctx.fillRect(0, GROUND - 8, W, 12);
+        ctx.fillStyle = "#a4df7b";
+        ctx.fillRect(0, GROUND - 8, W, 5);
+
+        // Water ripples
+        ctx.strokeStyle = "#a8f4ed";
+        ctx.lineWidth = 2;
+        for (let i = 0; i < 9; i++) {
+            const x = (i * 117 + frame * 0.6) % W;
+            const y = GROUND + 35 + (i % 3) * 32;
+            ctx.beginPath();
+            ctx.ellipse(x, y, 22, 5, 0, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+
+        // Sun
+        ctx.fillStyle = "#fff0a0";
+        ctx.beginPath();
+        ctx.arc(815, 65, 32, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Lily pads
+        for (let i = 0; i < 6; i++) {
+            const x = (i * 165 + 40) % W;
+            const y = GROUND + 25 + (i % 2) * 65;
+            ctx.fillStyle = "#278e68";
+            ctx.beginPath();
+            ctx.ellipse(x, y, 24, 10, 0, 0, Math.PI * 1.8);
+            ctx.lineTo(x, y);
+            ctx.fill();
+        }
+
+        // Lotus obstacles
+        ctx.font = "40px Arial";
+        ctx.textBaseline = "top";
+        for (const flower of lotuses) {
+            ctx.fillText("🪷", flower.x, flower.y);
+        }
+
+        // Snake
+        ctx.font = "48px Arial";
+        ctx.fillText("🐍", snake.x, GROUND - 47);
+
+        // Frog
+        ctx.fillText("🐸", frog.x, frog.y);
+
+        // Score
+        ctx.fillStyle = "#124d3b";
+        ctx.font = "bold 23px Arial";
+        ctx.fillText("Score: " + score, 22, 20);
+    }
+
+    function loop() {
+        if (!running) return;
+
+        update();
+
+        if (!running) return;
+
+        draw();
+        frameId = requestAnimationFrame(loop);
+    }
+
+    $("play").addEventListener("click", startGame);
+    $("restart").addEventListener("click", startGame);
+
+    $("homeBtn").addEventListener("click", () => {
+        running = false;
+        cancelAnimationFrame(frameId);
+        showScreen("home");
+    });
+
+    document.addEventListener("keydown", event => {
+        if (["Space", "ArrowUp", "KeyW"].includes(event.code)) {
+            if (running) {
+                event.preventDefault();
+                jump();
+            }
+        }
+    });
+
+    canvas.addEventListener("pointerdown", event => {
+        if (!running) return;
+        event.preventDefault();
+        jump();
+    });
+
+    showScreen("home");
+})();
+</script>
+
 </body>
 </html>
