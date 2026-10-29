@@ -5,32 +5,25 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Frog Pond Adventure</title>
-
 <style>
 * { box-sizing: border-box; }
-
 body {
     margin: 0;
-    min-height: 100vh;
     font-family: Arial, sans-serif;
     text-align: center;
     color: #174b3a;
     background: linear-gradient(#dff8e8, #9bd8b5);
 }
-
 .screen {
     min-height: 100vh;
+    padding: 20px 10px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 16px;
 }
-
 .hidden { display: none !important; }
-
 h1 { font-size: clamp(30px, 6vw, 48px); }
-
 button {
     padding: 14px 28px;
     margin: 8px;
@@ -42,9 +35,7 @@ button {
     font-weight: bold;
     cursor: pointer;
 }
-
 button:hover { background: #126b3b; }
-
 #game {
     display: block;
     width: min(900px, 96vw);
@@ -53,26 +44,24 @@ button:hover { background: #126b3b; }
     border-radius: 12px;
     touch-action: manipulation;
 }
-
 .header {
     width: min(900px, 96vw);
     display: flex;
     justify-content: space-between;
-    font-weight: bold;
+    gap: 10px;
     font-size: 20px;
+    font-weight: bold;
     margin-bottom: 8px;
 }
-
 .hint { font-size: 14px; }
 </style>
 </head>
-
 <body>
 
 <section id="home" class="screen">
     <div style="font-size:70px">🐸</div>
     <h1>Frog Pond Adventure</h1>
-    <p>Jump over the lotuses. Don't let the snake catch you!</p>
+    <p>Jump over the lotus flowers. Don't let the snake catch you!</p>
     <button id="play">▶ Play Game</button>
     <p class="hint">SPACE / ↑ / W / Tap to jump</p>
 </section>
@@ -120,22 +109,22 @@ button:hover { background: #126b3b; }
     function startGame() {
         cancelAnimationFrame(frameId);
 
-        score = 0;
         frame = 0;
-        spawnTimer = 75;
+        score = 0;
+        spawnTimer = 80;
         lotuses = [];
 
         frog = {
             x: 220,
-            y: GROUND - 44,
-            w: 44,
-            h: 44,
+            y: GROUND - 38,
+            w: 42,
+            h: 38,
             vy: 0,
             jumping: false
         };
 
-        // The snake begins behind the frog.
-        snake = { x: 35, w: 48 };
+        // Snake starts well behind the frog.
+        snake = { x: 30, w: 42 };
 
         running = true;
         $("score").textContent = "Score: 0";
@@ -147,16 +136,8 @@ button:hover { background: #126b3b; }
 
     function jump() {
         if (!running || frog.jumping) return;
-
         frog.vy = -14;
         frog.jumping = true;
-    }
-
-    function overlaps(a, b) {
-        return a.x + 8 < b.x + b.w - 5 &&
-               a.x + a.w - 8 > b.x + 5 &&
-               a.y + 5 < b.y + b.h - 5 &&
-               a.y + a.h - 5 > b.y + 8;
     }
 
     function endGame(reason) {
@@ -170,138 +151,197 @@ button:hover { background: #126b3b; }
         showScreen("over");
     }
 
-    // Draw a lotus using canvas shapes instead of an emoji.
-    function drawLotus(flower) {
-        const cx = flower.x + flower.w / 2;
-        const cy = flower.y + 23;
+    // Lotus is drawn with canvas shapes, not an emoji.
+    function drawLotus(f) {
+        const x = f.x + f.w / 2;
+        const y = GROUND - 22;
 
-        ctx.save();
-
-        // Lily pad
-        ctx.fillStyle = "#268b61";
+        // Green lily pad
+        ctx.fillStyle = "#218b57";
         ctx.beginPath();
-        ctx.ellipse(cx, cy + 9, 23, 9, 0, 0, Math.PI * 2);
+        ctx.ellipse(x, GROUND - 3, 24, 7, 0, 0, Math.PI * 2);
         ctx.fill();
 
         // Outer petals
         for (let i = 0; i < 8; i++) {
-            const angle = i * Math.PI * 2 / 8;
-
+            const a = i * Math.PI / 4;
             ctx.save();
-            ctx.translate(cx, cy);
-            ctx.rotate(angle);
-
-            ctx.fillStyle =
-                i % 2 === 0 ? "#ff80b5" : "#ed5796";
-
+            ctx.translate(x, y);
+            ctx.rotate(a);
+            ctx.fillStyle = i % 2 ? "#e94c94" : "#ff91c4";
             ctx.beginPath();
             ctx.ellipse(0, -9, 6, 13, 0, 0, Math.PI * 2);
             ctx.fill();
-
             ctx.restore();
         }
 
         // Inner petals
         for (let i = 0; i < 5; i++) {
-            const angle = i * Math.PI * 2 / 5;
-
+            const a = i * Math.PI * 2 / 5;
             ctx.save();
-            ctx.translate(cx, cy);
-            ctx.rotate(angle);
-
-            ctx.fillStyle = "#ffc0dc";
+            ctx.translate(x, y);
+            ctx.rotate(a);
+            ctx.fillStyle = "#ffd1e5";
             ctx.beginPath();
-            ctx.ellipse(0, -5, 4, 8, 0, 0, Math.PI * 2);
+            ctx.ellipse(0, -4, 4, 8, 0, 0, Math.PI * 2);
             ctx.fill();
-
             ctx.restore();
         }
 
-        // Golden centre
-        ctx.fillStyle = "#ffe56b";
+        ctx.fillStyle = "#ffdf55";
         ctx.beginPath();
-        ctx.arc(cx, cy, 4, 0, Math.PI * 2);
+        ctx.arc(x, y, 4, 0, Math.PI * 2);
         ctx.fill();
-
-        ctx.restore();
     }
 
     function update() {
         frame++;
 
-        // Frog movement and gravity
+        // Frog physics
         frog.y += frog.vy;
-        frog.vy += 0.7;
+        frog.vy += 0.65;
 
         const floor = GROUND - frog.h;
-
         if (frog.y >= floor) {
             frog.y = floor;
             frog.vy = 0;
             frog.jumping = false;
         }
 
-        // Create lotus obstacles
+        // Spawn lotus flowers
         spawnTimer--;
-
         if (spawnTimer <= 0) {
             lotuses.push({
-                x: W + 10,
-                y: GROUND - 42,
+                x: W + 20,
                 w: 42,
-                h: 42,
                 passed: false
             });
-
-            spawnTimer = Math.max(
-                85,
-                115 - Math.floor(score / 40)
-            );
+            spawnTimer = 100;
         }
 
-        const speed = Math.min(6, 3.5 + score / 250);
+        const speed = 4;
 
-        // Move obstacles and check collisions
-        for (const flower of lotuses) {
-            flower.x -= speed;
+        for (const f of lotuses) {
+            f.x -= speed;
 
-            if (overlaps(frog, flower)) {
-                endGame("You bumped into a lotus!");
+            // Collision: frog must jump high enough to clear the flower.
+            const frogBottom = frog.y + frog.h;
+            const frogRight = frog.x + frog.w - 6;
+            const frogLeft = frog.x + 6;
+            const flowerLeft = f.x + 7;
+            const flowerRight = f.x + f.w - 7;
+
+            const horizontalHit =
+                frogRight > flowerLeft && frogLeft < flowerRight;
+
+            const standingOnGround = frogBottom >= GROUND - 42;
+
+            if (horizontalHit && standingOnGround) {
+                endGame("You hit a lotus! Try jumping a little earlier.");
                 return;
             }
 
-            // Successfully passing a lotus earns points
-            // and pushes the snake backwards.
-            if (
-                !flower.passed &&
-                flower.x + flower.w < frog.x
-            ) {
-                flower.passed = true;
+            // Award points and push the snake BACK once per flower.
+            if (!f.passed && f.x + f.w < frog.x) {
+                f.passed = true;
                 score += 10;
 
-                snake.x = Math.max(0, snake.x - 65);
+                // Move the snake backward by 150 pixels.
+                snake.x = Math.max(0, snake.x - 150);
+
+                // Tiny visual reward flash.
+                $("score").textContent = "Score: " + score + " 🌸";
             }
         }
 
-        lotuses = lotuses.filter(
-            flower => flower.x + flower.w > -10
-        );
+        lotuses = lotuses.filter(f => f.x + f.w > -20);
 
-        // The snake slowly chases the frog.
-        // Its speed increases gradually as the score grows.
-        snake.x += 0.10 + Math.min(0.12, score / 10000);
+        // Slow chase, so each successful dodge creates real distance.
+        snake.x += 0.35;
 
-        if (snake.x + snake.w > frog.x + 4) {
-            endGame("The snake caught you!");
+        // The snake cannot catch the frog immediately after a setback.
+        if (snake.x + snake.w >= frog.x) {
+            endGame("The snake caught you! Dodge the flowers to push it back.");
             return;
         }
 
-        // Survival points
-        if (frame % 6 === 0) {
-            score++;
-        }
-
+        if (frame % 6 === 0) score++;
         $("score").textContent = "Score: " + score;
+    }
+
+    function drawFrog() {
+        const x = frog.x;
+        const y = frog.y;
+
+        // Body
+        ctx.fillStyle = "#48b84d";
+        ctx.beginPath();
+        ctx.ellipse(x + 21, y + 23, 20, 15, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Eyes
+        ctx.fillStyle = "#48b84d";
+        ctx.beginPath();
+        ctx.arc(x + 10, y + 9, 8, 0, Math.PI * 2);
+        ctx.arc(x + 31, y + 9, 8, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = "white";
+        ctx.beginPath();
+        ctx.arc(x + 10, y + 9, 5, 0, Math.PI * 2);
+        ctx.arc(x + 31, y + 9, 5, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = "#183d28";
+        ctx.beginPath();
+        ctx.arc(x + 11, y + 9, 2.5, 0, Math.PI * 2);
+        ctx.arc(x + 32, y + 9, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Smile
+        ctx.strokeStyle = "#174b3a";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(x + 21, y + 22, 8, 0.15, Math.PI - 0.15);
+        ctx.stroke();
+    }
+
+    function drawSnake() {
+        const x = snake.x;
+        const y = GROUND - 20;
+
+        // Body
+        ctx.fillStyle = "#398d42";
+        ctx.beginPath();
+        ctx.ellipse(x + 20, y, 24, 13, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Head
+        ctx.beginPath();
+        ctx.arc(x + 35, y - 5, 12, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Eye
+        ctx.fillStyle = "white";
+        ctx.beginPath();
+        ctx.arc(x + 39, y - 9, 4, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = "#172d19";
+        ctx.beginPath();
+        ctx.arc(x + 40, y - 9, 2, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Tongue
+        ctx.strokeStyle = "#ed4265";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(x + 45, y);
+        ctx.lineTo(x + 53, y + 2);
+        ctx.lineTo(x + 57, y - 2);
+        ctx.moveTo(x + 53, y + 2);
+        ctx.lineTo(x + 56, y + 6);
+        ctx.stroke();
     }
 
     function draw() {
@@ -309,20 +349,18 @@ button:hover { background: #126b3b; }
         const sky = ctx.createLinearGradient(0, 0, 0, GROUND);
         sky.addColorStop(0, "#c6f4d9");
         sky.addColorStop(1, "#70cbb0");
-
         ctx.fillStyle = sky;
         ctx.fillRect(0, 0, W, H);
 
         // Bushes
         ctx.fillStyle = "#80c99a";
-
         for (let i = 0; i < 8; i++) {
             ctx.beginPath();
             ctx.arc(i * 135, 195, 65, Math.PI, 0);
             ctx.fill();
         }
 
-        // Pond
+        // Pond and bank
         ctx.fillStyle = "#299eaf";
         ctx.fillRect(0, GROUND, W, H - GROUND);
 
@@ -335,11 +373,9 @@ button:hover { background: #126b3b; }
         // Water ripples
         ctx.strokeStyle = "#a8f4ed";
         ctx.lineWidth = 2;
-
         for (let i = 0; i < 9; i++) {
             const x = (i * 117 + frame * 0.6) % W;
             const y = GROUND + 35 + (i % 3) * 32;
-
             ctx.beginPath();
             ctx.ellipse(x, y, 22, 5, 0, 0, Math.PI * 2);
             ctx.stroke();
@@ -351,32 +387,14 @@ button:hover { background: #126b3b; }
         ctx.arc(815, 65, 32, 0, Math.PI * 2);
         ctx.fill();
 
-        // Decorative lily pads
-        for (let i = 0; i < 6; i++) {
-            const x = (i * 165 + 40) % W;
-            const y = GROUND + 25 + (i % 2) * 65;
+        // Lotus obstacles
+        for (const f of lotuses) drawLotus(f);
 
-            ctx.fillStyle = "#278e68";
-            ctx.beginPath();
-            ctx.ellipse(x, y, 24, 10, 0, 0, Math.PI * 1.8);
-            ctx.lineTo(x, y);
-            ctx.fill();
-        }
+        // Snake and frog
+        drawSnake();
+        drawFrog();
 
-        // Draw the moving lotus obstacles.
-        for (const flower of lotuses) {
-            drawLotus(flower);
-        }
-
-        // Snake
-        ctx.font = "48px Arial";
-        ctx.textBaseline = "alphabetic";
-        ctx.fillText("🐍", snake.x, GROUND - 7);
-
-        // Frog
-        ctx.fillText("🐸", frog.x, frog.y + frog.h);
-
-        // Score on the canvas
+        // Score
         ctx.fillStyle = "#124d3b";
         ctx.font = "bold 23px Arial";
         ctx.fillText("Score: " + score, 22, 30);
@@ -386,14 +404,12 @@ button:hover { background: #126b3b; }
         if (!running) return;
 
         update();
-
         if (!running) return;
 
         draw();
         frameId = requestAnimationFrame(loop);
     }
 
-    // One click handler per button.
     $("play").addEventListener("click", startGame);
     $("restart").addEventListener("click", startGame);
 
@@ -403,20 +419,15 @@ button:hover { background: #126b3b; }
         showScreen("home");
     });
 
-    // Keyboard controls
     document.addEventListener("keydown", event => {
-        if (["Space", "ArrowUp", "KeyW"].includes(event.code)) {
-            if (running) {
-                event.preventDefault();
-                jump();
-            }
+        if (["Space", "ArrowUp", "KeyW"].includes(event.code) && running) {
+            event.preventDefault();
+            jump();
         }
     });
 
-    // Mouse and touchscreen controls
     canvas.addEventListener("pointerdown", event => {
         if (!running) return;
-
         event.preventDefault();
         jump();
     });
@@ -424,6 +435,5 @@ button:hover { background: #126b3b; }
     showScreen("home");
 })();
 </script>
-
 </body>
 </html>
